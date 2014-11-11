@@ -5,9 +5,9 @@
       , GAP_SIZE = 10 // Size of gap between tiles in pixels
       , HALF_GAP_SIZE = GAP_SIZE / 2
       , TILE_GAP_SIZE = TILE_SIZE + GAP_SIZE
+      , ICON_SIZE = 35
       , MARKER_SIZE = 4
-      , BOARD_WIDTH = 6 // Number of columns of icons
-      , BOARD_HEIGHT = 5 // Number of rows of icons
+      , BUTTON_SIZE = 40
       //, WHITE    = '#ffffff'// 0xffffff
       , RED      = '#ff0000'// 0xff0000
       , GREEN    = '#00ff00'// 0x00ff00
@@ -66,8 +66,8 @@
     Game.prototype = {
 
         create: function () {
-            this.xmargin = parseInt((this.world.width - (BOARD_WIDTH * TILE_GAP_SIZE)) / 2);
-            this.ymargin = parseInt((this.world.height - (BOARD_HEIGHT * TILE_GAP_SIZE)) / 2);
+            this.xmargin = parseInt((this.world.width - (this.game.boardWidth * TILE_GAP_SIZE)) / 2);
+            this.ymargin = parseInt((this.world.height - (this.game.boardHeight * TILE_GAP_SIZE)) / 2);
             this.borderLeft = this.xmargin + HALF_GAP_SIZE;
             this.borderRight = this.world.width - this.xmargin - HALF_GAP_SIZE;
             this.borderTop = this.ymargin + HALF_GAP_SIZE;
@@ -77,11 +77,62 @@
                                                   'background');
             this.selectedTiles = []; // Stores the (x, y) of the tiles clicked
             this.createBoard();
+            this.createMenu();
             this.marker = this.add.graphics();
             this.marker.lineStyle(MARKER_SIZE, HIGHLIGHT_COLOR, 1);
             this.marker.drawRect(-MARKER_SIZE/2, -MARKER_SIZE/2,
                                  TILE_SIZE+MARKER_SIZE, TILE_SIZE+MARKER_SIZE);
+
+            this.score = 0;
+            var text = 'Tries\n\n' + this.score;
+            this.textStyle = { font: '20px Arial', fill: '#ffffff', align: 'center' };
+            this.scoreText = this.add.text(15, this.world.height - 50, text, this.textStyle);
+            this.scoreText.anchor.set(0, 0.5);
+            if(!!localStorage) {
+                this.memoryBestScoreText = 'memory.bestScore' + this.game.boardWidth + 'x' + this.game.boardHeight;
+                this.bestScore = localStorage.getItem(this.memoryBestScoreText);
+                if(this.bestScore) {
+                    text = 'Best\n\n' + this.bestScore;
+                    this.bestText = this.add.text(this.world.width - 15, this.world.height - 50, text, this.textStyle);
+                    this.bestText.anchor.set(1.0, 0.5);
+                }
+            }
+
             this.input.onDown.add(this.processClick, this);
+        },
+
+        createMenu: function () {
+            var x = this.world.width - BUTTON_SIZE - 15
+              , y = 10;
+
+            this.buttons = [];
+            this.buttonIcons = this.add.group();
+
+            this.buttonIcons.add(this.drawButton({shape: '\uf015', color: 'gray'}, x, y));
+            this.buttons.push(new Phaser.Rectangle(x, y, BUTTON_SIZE, BUTTON_SIZE));
+
+            y = BUTTON_SIZE + 15 + 10;
+            this.buttonIcons.add(this.drawButton({shape: '\uf01e', color: 'gray'}, x, y));
+            this.buttons.push(new Phaser.Rectangle(x, y, BUTTON_SIZE, BUTTON_SIZE));
+        },
+
+        drawButton: function(icon, x, y) {
+            var half = parseInt(BUTTON_SIZE * 0.5)
+              , text = icon.shape
+              , style = { font: (BUTTON_SIZE - 10) + 'px FontAwesome',
+                          fill: icon.color, stroke: '#00ff00', align: 'center'}
+              , t = this.add.text(x + half, y + half + 5, text, style);
+            t.anchor.set(0.5, 0.5);
+            return t;
+        },
+
+        getButtonAtPixel: function(x, y) {
+            for(var i = 0; i < this.buttons.length; i++) {
+                if(this.buttons[i].contains(x, y)) {
+                    return i;
+                }
+            }
+            return null;
         },
 
         createBoard: function () {
@@ -96,6 +147,8 @@
             this.drawIcons(this.mainBoard);
             this.tiles.setAllChildren('visible', true);
             this.world.bringToTop(this.tiles);
+            this.score = 0;
+            this.scoreText.setText('Tries\n\n' + this.score);
         },
 
         getRandomizedBoard: function () {
@@ -111,7 +164,7 @@
             this.shuffle(icons);
 
             // Calculate how many icons are needed
-            var numIconsUsed = parseInt(BOARD_WIDTH * BOARD_HEIGHT / 2);
+            var numIconsUsed = parseInt(this.game.boardWidth * this.game.boardHeight / 2);
 
             // Make two of each
             icons = icons.slice(0, numIconsUsed);
@@ -120,9 +173,9 @@
 
             // Create the board data structure, with randomly placed icons
             var board = [];
-            for(var x = 0; x < BOARD_WIDTH; x++) {
+            for(var x = 0; x < this.game.boardWidth; x++) {
                 var column = [];
-                for(var y = 0; y < BOARD_HEIGHT; y++) {
+                for(var y = 0; y < this.game.boardHeight; y++) {
                     column.push(icons[0]);
                     icons.splice(0, 1);
                 }
@@ -153,9 +206,9 @@
         drawIcons: function(board) {
             // Draw all the icons
             this.icons = this.add.group();
-            for(var x = 0; x < BOARD_WIDTH; x++) {
+            for(var x = 0; x < this.game.boardWidth; x++) {
                 var column = this.add.group();
-                for(var y = 0; y < BOARD_HEIGHT; y++) {
+                for(var y = 0; y < this.game.boardHeight; y++) {
                     var leftTop = this.leftTopCoordsOfTile({x: x, y: y});
                     var icon = this.getShapeAndColor(board, {x: x, y: y});
                     column.add(this.drawIcon(icon, leftTop.x, leftTop.y));
@@ -167,13 +220,13 @@
         drawTiles: function() {
             // Draw all the tiles
             this.tiles = this.add.group();
-            for(var x = 0; x < BOARD_WIDTH; x++) {
+            for(var x = 0; x < this.game.boardWidth; x++) {
                 var column = this.add.group();
-                for(var y = 0; y < BOARD_HEIGHT; y++) {
+                for(var y = 0; y < this.game.boardHeight; y++) {
                     var leftTop = this.leftTopCoordsOfTile({x: x, y: y});
                     var tile = this.add.graphics();
                     tile.beginFill(TILE_COLOR);
-                    tile.lineStyle(1, TILE_COLOR, 1);
+                    tile.lineStyle(0, TILE_COLOR, 1);
                     tile.drawRect(leftTop.x, leftTop.y, TILE_SIZE, TILE_SIZE);
                     tile.endFill();
                     column.add(tile);
@@ -217,6 +270,17 @@
             }
             else {
                 this.marker.visible = false;
+
+                // Check if a mouse is over menu button
+                var button = this.getButtonAtPixel(this.input.activePointer.worldX,
+                                                   this.input.activePointer.worldY);
+                if(button !== null) {
+                    //this.buttonIcons.getAt(button).strokeThickness = 2;
+                    this.buttonIcons.getAt(button).fill = 'white';
+                } else {
+                    //this.buttonIcons.setAllChildren('strokeThickness', 0);
+                    this.buttonIcons.setAllChildren('fill', 'gray');
+                }
             }
         },
 
@@ -230,6 +294,9 @@
                 this.selectedTiles.push(tile);
                 if(this.selectedTiles.length > 1) {
                     // The current tile was the second tile clicked
+                    // Update score
+                    this.score++;
+                    this.scoreText.setText('Tries\n\n' + this.score);
                     // Check if there is a match between the two icons
                     var icon1 = this.getShapeAndColor(this.mainBoard, this.selectedTiles[0]);
                     var icon2 = this.getShapeAndColor(this.mainBoard, tile);
@@ -243,8 +310,34 @@
                             // Show the fully unrevealed board for two seconds
                             this.time.events.add(Phaser.Timer.SECOND * 2.0,
                                                  this.resetBoard, this);
+                            // Update best score ?
+                            if(!!localStorage) {
+                                this.bestScore = localStorage.getItem(this.memoryBestScoreText);
+                                if(!this.bestScore || this.bestScore > this.score) {
+                                    this.bestScore = this.score;
+                                    localStorage.setItem(this.memoryBestScoreText, this.bestScore);
+                                    var text = 'Best\n\n' + this.bestScore;
+                                    if(!this.bestText) {
+                                        this.bestText = this.add.text(this.world.width - 15, this.world.height - 50, text, this.textStyle);
+                                        this.bestText.anchor.set(1.0, 0.5);
+                                    } else {
+                                        this.bestText.setText(text);
+                                    }
+                                }
+                            }
                         }
                         this.selectedTiles = []; // Reset variable
+                    }
+                }
+            } else {
+                // Check if a menu button is clicked
+                var button = this.getButtonAtPixel(this.input.activePointer.worldX,
+                                                   this.input.activePointer.worldY);
+                if(button !== null) {
+                    if(button === 0) {
+                        this.game.state.start('menu');
+                    } else {
+                        this.resetBoard();
                     }
                 }
             }
@@ -261,8 +354,8 @@
 
         hasWon: function () {
             // Returns true if all the tiles have been revealed, otherwise false
-            for(var x = 0; x < BOARD_WIDTH; x++) {
-                for(var y = 0; y < BOARD_HEIGHT; y++) {
+            for(var x = 0; x < this.game.boardWidth; x++) {
+                for(var y = 0; y < this.game.boardHeight; y++) {
                     if(this.tiles.getAt(x).getAt(y).visible) {
                         return false; // Return false if any tiles are covered
                     }
@@ -277,7 +370,7 @@
         drawIcon: function(icon, x, y) {
             var half = parseInt(TILE_SIZE * 0.5)
               , text = icon.shape
-              , style = { font: (TILE_SIZE - 10) + 'px FontAwesome',
+              , style = { font: (ICON_SIZE) + 'px FontAwesome',
                           fill: icon.color, align: 'center'}
               , t = this.add.text(x + half, y + half + 5, text, style);
             t.anchor.set(0.5, 0.5);
