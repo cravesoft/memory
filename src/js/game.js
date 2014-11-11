@@ -8,23 +8,57 @@
       , MARKER_SIZE = 4
       , BOARD_WIDTH = 6 // Number of columns of icons
       , BOARD_HEIGHT = 5 // Number of rows of icons
-      , WHITE    = 0xffffff
-      , RED      = 0xff0000
-      , GREEN    = 0x00ff00
-      , BLUE     = 0x0000ff
-      , YELLOW   = 0xffff00
-      , ORANGE   = 0xff8000
-      , PURPLE   = 0xff00ff
-      , CYAN     = 0x00ffff
-      , TILE_COLOR = WHITE
-      , HIGHLIGHT_COLOR = GREEN
-      , DONUT = 'donut'
-      , SQUARE = 'square'
-      , DIAMOND = 'diamond'
-      , CROSS = 'cross'
-      , OVAL = 'oval'
-      , ALL_COLORS = [RED, GREEN, BLUE, YELLOW, ORANGE, PURPLE, CYAN]
-      , ALL_SHAPES = [DONUT, SQUARE, DIAMOND, CROSS, OVAL];
+      //, WHITE    = '#ffffff'// 0xffffff
+      , RED      = '#ff0000'// 0xff0000
+      , GREEN    = '#00ff00'// 0x00ff00
+      , BLUE     = '#0086ff'// 0x0086ff
+      , YELLOW   = '#ffff00'// 0xffff00
+      , ORANGE   = '#ff8000'// 0xff8000
+      , MAGENTA  = '#ff00ff'// 0xff00ff
+      , CYAN     = '#00ffff'// 0x00ffff
+      , TILE_COLOR = 0xffffff // White
+      , HIGHLIGHT_COLOR = 0x00ff00 // Green
+      //, ANCHOR = '\uf13d'
+      , BELL = '\uf0f3'
+      , BICYCLE = '\uf206'
+      //, BINOCULARS = '\uf1e5'
+      , BOLT = '\uf0e7'
+      , BOMB = '\uf1e2'
+      //, BUS = '\uf207'
+      //, CAMERA = '\uf030'
+      , CAR = '\uf1b9'
+      , CHILD = '\uf1ae'
+      , CLOSE = '\uf00d'
+      , COFFEE = '\uf0f4'
+      //, CUTLERY = '\uf0f5'
+      , ENVELOPE = '\uf0e0'
+      , EYE = '\uf06e'
+      , FLAG = '\uf024'
+      , FLASK = '\uf0c3'
+      , FROWN = '\uf119'
+      , GLASS = '\uf000'
+      , HOME = '\uf015'
+      , KEY = '\uf084'
+      , LEAF = '\uf06c'
+      , MAGNET = '\uf076'
+      //, PAPER_PLANE = '\uf1d8'
+      , HEART = '\uf004'
+      , MEH = '\uf11a'
+      , MUSIC = '\uf001'
+      //, PAINT_BRUSH = '\uf1fc'
+      , PAW = '\uf1b0'
+      , PLANE = '\uf072'
+      //, PLUG = '\uf1e6'
+      , PLUS = '\uf067'
+      , ROCKET = '\uf135'
+      //, STAR = '\uf005'
+      , TROPHY = '\uf091'
+      , TRUCK = '\uf0d1'
+      , SMILE = '\uf118'
+      , UMBRELLA = '\uf0e9'
+      , WRENCH = '\uf0ad'
+      , ALL_COLORS = [RED, GREEN, BLUE, YELLOW, ORANGE, MAGENTA, CYAN]
+      , ALL_SHAPES = [BELL, BICYCLE, BOLT, BOMB, CAR, CHILD, CLOSE, COFFEE, ENVELOPE, EYE, FLAG, FLASK, FROWN, GLASS, HEART, HOME, KEY, LEAF, MAGNET, MEH, MUSIC, PAW, PLANE, PLUS, ROCKET, TROPHY, SMILE, TRUCK, UMBRELLA, WRENCH];
 
     function Game() {
     }
@@ -241,40 +275,13 @@
         },
 
         drawIcon: function(icon, x, y) {
-            var quarter = parseInt(TILE_SIZE * 0.25)
-              , half = parseInt(TILE_SIZE * 0.5)
-              , g = this.add.graphics();
-
-            // Draw the shapes
-            if(icon.shape === DONUT) {
-                g.lineStyle(5, icon.color, 1);
-                g.drawCircle(x + half, y + half, half + 5);
-            } else if(icon.shape === SQUARE) {
-                g.lineStyle(1, icon.color, 1);
-                g.beginFill(icon.color, 1);
-                g.drawRect(x + quarter, y + quarter, TILE_SIZE - half, TILE_SIZE - half);
-                g.endFill();
-            } else if(icon.shape === DIAMOND) {
-                g.beginFill(icon.color, 1);
-                g.lineStyle(1, icon.color, 1);
-                g.drawPolygon([x + half, y + 5, x + TILE_SIZE - 5, y + half, x + half, y + TILE_SIZE - 5, x + 5, y + half]);
-                g.endFill();
-            } else if(icon.shape === CROSS) {
-                g.lineStyle(6, icon.color, 1);
-                g.moveTo(x + half, y + 5);
-                g.lineTo(x + half, y + TILE_SIZE - 5);
-                g.moveTo(x + 5, y + half);
-                g.lineTo(x + TILE_SIZE - 5, y + half);
-            } else if(icon.shape === OVAL) {
-                g.lineStyle(1, icon.color, 1);
-                g.beginFill(icon.color, 1);
-                g.moveTo(x + 5, y + half);
-                g.bezierCurveTo(x + 5, y + 5, x + TILE_SIZE - 5, y + 5, x + TILE_SIZE - 5, y + half);
-                g.bezierCurveTo(x + TILE_SIZE - 5, y + TILE_SIZE - 5, x + 5, y + TILE_SIZE - 5, x + 5, y + half);
-                //g.drawEllipse(x, y + quarter, TILE_SIZE, half);
-                g.endFill();
-            }
-            return g;
+            var half = parseInt(TILE_SIZE * 0.5)
+              , text = icon.shape
+              , style = { font: (TILE_SIZE - 10) + 'px FontAwesome',
+                          fill: icon.color, align: 'center'}
+              , t = this.add.text(x + half, y + half + 5, text, style);
+            t.anchor.set(0.5, 0.5);
+            return t;
         }
 
     };
