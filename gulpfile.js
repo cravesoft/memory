@@ -13,7 +13,12 @@ var gulp = require('gulp')
 
 paths = {
     assets: 'src/assets/**/*',
-    css:    'src/css/*.css', 
+    css:    [
+        'src/css/*.css',
+    ],
+    csslibs: [
+        'src/bower_components/font-awesome/css/font-awesome.min.css'
+    ],
     libs:  [
         'src/bower_components/phaser-official/build/phaser.min.js'
     ],
@@ -28,9 +33,18 @@ gulp.task('clean', function () {
     return stream;
 });
 
+gulp.task('fonts', function() {
+    return gulp.src([
+        'src/bower_components/font-awesome/fonts/*'])
+    .pipe(gulp.dest('dist/fonts/'));
+});
+
 gulp.task('copy', ['clean'], function () {
     gulp.src(paths.assets)
         .pipe(gulp.dest(paths.dist + 'assets'))
+        .on('error', gutil.log);
+    gulp.src(paths.csslibs)
+        .pipe(gulp.dest(paths.dist + 'css'))
         .on('error', gutil.log);
 });
 
@@ -46,12 +60,12 @@ gulp.task('uglify', ['clean','lint'], function () {
 
 gulp.task('minifycss', ['clean'], function () {
  gulp.src(paths.css)
+        .pipe(concat('main.min.css'))
         .pipe(minifycss({
             keepSpecialComments: false,
             removeEmpty: true
         }))
-        .pipe(rename({suffix: '.min'}))
-        .pipe(gulp.dest(paths.dist))
+        .pipe(gulp.dest(paths.dist + 'css'))
         .on('error', gutil.log);
 });
 
@@ -96,4 +110,4 @@ gulp.task('watch', function () {
 });
 
 gulp.task('default', ['connect', 'watch']);
-gulp.task('build', ['copy', 'uglify', 'minifycss', 'processhtml', 'minifyhtml']);
+gulp.task('build', ['copy', 'uglify', 'minifycss', 'processhtml', 'minifyhtml', 'fonts']);
