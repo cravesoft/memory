@@ -18,19 +18,19 @@
       , CYAN     = '#00ffff'// 0x00ffff
       , TILE_COLOR = 0xffffff // White
       , HIGHLIGHT_COLOR = 0x00ff00 // Green
-      //, ANCHOR = '\uf13d'
+      , ANCHOR = '\uf13d'
       , BELL = '\uf0f3'
       , BICYCLE = '\uf206'
-      //, BINOCULARS = '\uf1e5'
+      , BINOCULARS = '\uf1e5'
       , BOLT = '\uf0e7'
       , BOMB = '\uf1e2'
-      //, BUS = '\uf207'
-      //, CAMERA = '\uf030'
+      , BUS = '\uf207'
+      , CAMERA = '\uf030'
       , CAR = '\uf1b9'
       , CHILD = '\uf1ae'
       , CLOSE = '\uf00d'
       , COFFEE = '\uf0f4'
-      //, CUTLERY = '\uf0f5'
+      , CUTLERY = '\uf0f5'
       , ENVELOPE = '\uf0e0'
       , EYE = '\uf06e'
       , FLAG = '\uf024'
@@ -41,24 +41,24 @@
       , KEY = '\uf084'
       , LEAF = '\uf06c'
       , MAGNET = '\uf076'
-      //, PAPER_PLANE = '\uf1d8'
+      , PAPER_PLANE = '\uf1d8'
       , HEART = '\uf004'
       , MEH = '\uf11a'
       , MUSIC = '\uf001'
-      //, PAINT_BRUSH = '\uf1fc'
+      , PAINT_BRUSH = '\uf1fc'
       , PAW = '\uf1b0'
       , PLANE = '\uf072'
-      //, PLUG = '\uf1e6'
+      , PLUG = '\uf1e6'
       , PLUS = '\uf067'
       , ROCKET = '\uf135'
-      //, STAR = '\uf005'
+      , STAR = '\uf005'
       , TROPHY = '\uf091'
       , TRUCK = '\uf0d1'
       , SMILE = '\uf118'
       , UMBRELLA = '\uf0e9'
       , WRENCH = '\uf0ad'
       , ALL_COLORS = [RED, GREEN, BLUE, YELLOW, ORANGE, MAGENTA, CYAN]
-      , ALL_SHAPES = [BELL, BICYCLE, BOLT, BOMB, CAR, CHILD, CLOSE, COFFEE, ENVELOPE, EYE, FLAG, FLASK, FROWN, GLASS, HEART, HOME, KEY, LEAF, MAGNET, MEH, MUSIC, PAW, PLANE, PLUS, ROCKET, TROPHY, SMILE, TRUCK, UMBRELLA, WRENCH];
+      , ALL_SHAPES = [ANCHOR, BELL, BICYCLE, BINOCULARS, BOLT, BOMB, BUS, CAMERA, CAR, CHILD, CLOSE, COFFEE, ENVELOPE, EYE, FLAG, FLASK, FROWN, GLASS, HEART, HOME, KEY, LEAF, CUTLERY, MAGNET, MEH, MUSIC, PAPER_PLANE, PAINT_BRUSH, PAW, PLANE, PLUG, PLUS, ROCKET, TROPHY, SMILE, STAR, TRUCK, UMBRELLA, WRENCH];
 
     function Game() {
     }
@@ -370,7 +370,7 @@
         drawIcon: function(icon, x, y) {
             var half = parseInt(TILE_SIZE * 0.5)
               , text = icon.shape
-              , style = { font: (ICON_SIZE) + 'px FontAwesome',
+              , style = { font: ICON_SIZE + 'px FontAwesome',
                           fill: icon.color, align: 'center'}
               , t = this.add.text(x + half, y + half + 5, text, style);
             t.anchor.set(0.5, 0.5);
