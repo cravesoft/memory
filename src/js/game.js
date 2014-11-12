@@ -1,64 +1,70 @@
 (function() {
     'use strict';
 
-    var TILE_SIZE = 50 // Size of tile height & width in pixels
+    var TILE_SIZE = 70 // Size of tile height & width in pixels
       , GAP_SIZE = 10 // Size of gap between tiles in pixels
-      , HALF_GAP_SIZE = GAP_SIZE / 2
+      , HALF_GAP_SIZE = GAP_SIZE * 0.5
       , TILE_GAP_SIZE = TILE_SIZE + GAP_SIZE
-      , ICON_SIZE = 35
+      , ICON_SIZE = 50
       , MARKER_SIZE = 4
-      , BUTTON_SIZE = 40
-      //, WHITE    = '#ffffff'// 0xffffff
-      , RED      = '#ff0000'// 0xff0000
-      , GREEN    = '#00ff00'// 0x00ff00
-      , BLUE     = '#0086ff'// 0x0086ff
-      , YELLOW   = '#ffff00'// 0xffff00
-      , ORANGE   = '#ff8000'// 0xff8000
-      , MAGENTA  = '#ff00ff'// 0xff00ff
-      , CYAN     = '#00ffff'// 0x00ffff
+      , BUTTON_SIZE = 60
+      , BUTTON_MARGIN = 10
       , TILE_COLOR = 0xffffff // White
       , HIGHLIGHT_COLOR = 0x00ff00 // Green
-      , ANCHOR = '\uf13d'
-      , BELL = '\uf0f3'
-      , BICYCLE = '\uf206'
-      , BINOCULARS = '\uf1e5'
-      , BOLT = '\uf0e7'
-      , BOMB = '\uf1e2'
-      , BUS = '\uf207'
-      , CAMERA = '\uf030'
-      , CAR = '\uf1b9'
-      , CHILD = '\uf1ae'
-      , CLOSE = '\uf00d'
-      , COFFEE = '\uf0f4'
-      , CUTLERY = '\uf0f5'
-      , ENVELOPE = '\uf0e0'
-      , EYE = '\uf06e'
-      , FLAG = '\uf024'
-      , FLASK = '\uf0c3'
-      , FROWN = '\uf119'
-      , GLASS = '\uf000'
-      , HOME = '\uf015'
-      , KEY = '\uf084'
-      , LEAF = '\uf06c'
-      , MAGNET = '\uf076'
+      , RED         = '#ff0000'
+      , GREEN       = '#00ff00'
+      , BLUE        = '#0086ff'
+      , YELLOW      = '#ffff00'
+      , ORANGE      = '#ff8000'
+      , MAGENTA     = '#ff00ff'
+      , CYAN        = '#00ffff'
+      , ANCHOR      = '\uf13d'
+      , BELL        = '\uf0f3'
+      , BICYCLE     = '\uf206'
+      , BINOCULARS  = '\uf1e5'
+      , BOLT        = '\uf0e7'
+      , BOMB        = '\uf1e2'
+      , BUS         = '\uf207'
+      , CAMERA      = '\uf030'
+      , CAR         = '\uf1b9'
+      , CHILD       = '\uf1ae'
+      , CLOSE       = '\uf00d'
+      , COFFEE      = '\uf0f4'
+      , CUTLERY     = '\uf0f5'
+      , ENVELOPE    = '\uf0e0'
+      , EYE         = '\uf06e'
+      , FLAG        = '\uf024'
+      , FLASK       = '\uf0c3'
+      , FROWN       = '\uf119'
+      , GLASS       = '\uf000'
+      , HOME        = '\uf015'
+      , KEY         = '\uf084'
+      , LEAF        = '\uf06c'
+      , MAGNET      = '\uf076'
       , PAPER_PLANE = '\uf1d8'
-      , HEART = '\uf004'
-      , MEH = '\uf11a'
-      , MUSIC = '\uf001'
+      , HEART       = '\uf004'
+      , MEH         = '\uf11a'
+      , MUSIC       = '\uf001'
       , PAINT_BRUSH = '\uf1fc'
-      , PAW = '\uf1b0'
-      , PLANE = '\uf072'
-      , PLUG = '\uf1e6'
-      , PLUS = '\uf067'
-      , ROCKET = '\uf135'
-      , STAR = '\uf005'
-      , TROPHY = '\uf091'
-      , TRUCK = '\uf0d1'
-      , SMILE = '\uf118'
-      , UMBRELLA = '\uf0e9'
-      , WRENCH = '\uf0ad'
+      , PAW         = '\uf1b0'
+      , PLANE       = '\uf072'
+      , PLUG        = '\uf1e6'
+      , PLUS        = '\uf067'
+      , REPEAT      = '\uf01e'
+      , ROCKET      = '\uf135'
+      , STAR        = '\uf005'
+      , TROPHY      = '\uf091'
+      , TRUCK       = '\uf0d1'
+      , SMILE       = '\uf118'
+      , UMBRELLA    = '\uf0e9'
+      , WRENCH      = '\uf0ad'
       , ALL_COLORS = [RED, GREEN, BLUE, YELLOW, ORANGE, MAGENTA, CYAN]
-      , ALL_SHAPES = [ANCHOR, BELL, BICYCLE, BINOCULARS, BOLT, BOMB, BUS, CAMERA, CAR, CHILD, CLOSE, COFFEE, ENVELOPE, EYE, FLAG, FLASK, FROWN, GLASS, HEART, HOME, KEY, LEAF, CUTLERY, MAGNET, MEH, MUSIC, PAPER_PLANE, PAINT_BRUSH, PAW, PLANE, PLUG, PLUS, ROCKET, TROPHY, SMILE, STAR, TRUCK, UMBRELLA, WRENCH];
+      , ALL_SHAPES = [ANCHOR, BELL, BICYCLE, BINOCULARS, BOLT, BOMB, BUS,
+                      CAMERA, CAR, CHILD, CLOSE, COFFEE, ENVELOPE, EYE, FLAG,
+                      FLASK, FROWN, GLASS, HEART, HOME, KEY, LEAF, CUTLERY,
+                      MAGNET, MEH, MUSIC, PAPER_PLANE, PAINT_BRUSH, PAW, PLANE,
+                      PLUG, PLUS, ROCKET, TROPHY, SMILE, STAR, TRUCK, UMBRELLA,
+                      WRENCH];
 
     function Game() {
     }
@@ -66,8 +72,11 @@
     Game.prototype = {
 
         create: function () {
-            this.xmargin = parseInt((this.world.width - (this.game.boardWidth * TILE_GAP_SIZE)) / 2);
-            this.ymargin = parseInt((this.world.height - (this.game.boardHeight * TILE_GAP_SIZE)) / 2);
+            this.xmargin = parseInt((this.world.width - (this.game.boardWidth *
+                                    TILE_GAP_SIZE)) * 0.5);
+            this.ymargin = parseInt((this.world.height -
+                                     (this.game.boardHeight * TILE_GAP_SIZE)) *
+                                    0.5);
             this.borderLeft = this.xmargin + HALF_GAP_SIZE;
             this.borderRight = this.world.width - this.xmargin - HALF_GAP_SIZE;
             this.borderTop = this.ymargin + HALF_GAP_SIZE;
@@ -80,20 +89,27 @@
             this.createMenu();
             this.marker = this.add.graphics();
             this.marker.lineStyle(MARKER_SIZE, HIGHLIGHT_COLOR, 1);
-            this.marker.drawRect(-MARKER_SIZE/2, -MARKER_SIZE/2,
-                                 TILE_SIZE+MARKER_SIZE, TILE_SIZE+MARKER_SIZE);
+            this.marker.drawRect(-MARKER_SIZE * 0.5, -MARKER_SIZE * 0.5,
+                                 TILE_SIZE + MARKER_SIZE,
+                                 TILE_SIZE + MARKER_SIZE);
 
             this.score = 0;
             var text = 'Tries\n\n' + this.score;
-            this.textStyle = { font: '20px Arial', fill: '#ffffff', align: 'center' };
-            this.scoreText = this.add.text(15, this.world.height - 50, text, this.textStyle);
+            this.textStyle = { font: '30px Arial', fill: '#ffffff',
+                               align: 'center' };
+            this.scoreText = this.add.text(15, this.world.height - 60, text,
+                                           this.textStyle);
             this.scoreText.anchor.set(0, 0.5);
             if(!!localStorage) {
-                this.memoryBestScoreText = 'memory.bestScore' + this.game.boardWidth + 'x' + this.game.boardHeight;
+                this.memoryBestScoreText = 'memory.bestScore' +
+                                           this.game.boardWidth + 'x' +
+                                           this.game.boardHeight;
                 this.bestScore = localStorage.getItem(this.memoryBestScoreText);
                 if(this.bestScore) {
                     text = 'Best\n\n' + this.bestScore;
-                    this.bestText = this.add.text(this.world.width - 15, this.world.height - 50, text, this.textStyle);
+                    this.bestText = this.add.text(this.world.width - 15,
+                                                  this.world.height - 60, text,
+                                                  this.textStyle);
                     this.bestText.anchor.set(1.0, 0.5);
                 }
             }
@@ -108,21 +124,25 @@
             this.buttons = [];
             this.buttonIcons = this.add.group();
 
-            this.buttonIcons.add(this.drawButton({shape: '\uf015', color: 'gray'}, x, y));
-            this.buttons.push(new Phaser.Rectangle(x, y, BUTTON_SIZE, BUTTON_SIZE));
+            this.buttonIcons.add(this.drawButton({shape: HOME,
+                                                  color: 'gray'}, x, y));
+            this.buttons.push(new Phaser.Rectangle(x, y, BUTTON_SIZE,
+                                                         BUTTON_SIZE));
 
             y = BUTTON_SIZE + 15 + 10;
-            this.buttonIcons.add(this.drawButton({shape: '\uf01e', color: 'gray'}, x, y));
-            this.buttons.push(new Phaser.Rectangle(x, y, BUTTON_SIZE, BUTTON_SIZE));
+            this.buttonIcons.add(this.drawButton({shape: REPEAT, color: 'gray'},
+                                                 x, y));
+            this.buttons.push(new Phaser.Rectangle(x, y, BUTTON_SIZE,
+                                                         BUTTON_SIZE));
         },
 
         drawButton: function(icon, x, y) {
             var half = parseInt(BUTTON_SIZE * 0.5)
               , text = icon.shape
-              , style = { font: (BUTTON_SIZE - 10) + 'px FontAwesome',
+              , style = { font: (BUTTON_SIZE - BUTTON_MARGIN) + 'px FontAwesome',
                           fill: icon.color, stroke: '#00ff00', align: 'center'}
               , t = this.add.text(x + half, y + half + 5, text, style);
-            t.anchor.set(0.5, 0.5);
+            t.anchor.set(0.5);
             return t;
         },
 
@@ -164,7 +184,8 @@
             this.shuffle(icons);
 
             // Calculate how many icons are needed
-            var numIconsUsed = parseInt(this.game.boardWidth * this.game.boardHeight / 2);
+            var numIconsUsed = parseInt(this.game.boardWidth *
+                                        this.game.boardHeight * 0.5);
 
             // Make two of each
             icons = icons.slice(0, numIconsUsed);
@@ -186,7 +207,7 @@
         },
 
         shuffle: function(array) {
-            var currentIndex = array.length, temporaryValue, randomIndex ;
+            var currentIndex = array.length, temporaryValue, randomIndex;
 
             // While there remain elements to shuffle
             while(0 !== currentIndex) {
@@ -209,8 +230,8 @@
             for(var x = 0; x < this.game.boardWidth; x++) {
                 var column = this.add.group();
                 for(var y = 0; y < this.game.boardHeight; y++) {
-                    var leftTop = this.leftTopCoordsOfTile({x: x, y: y});
-                    var icon = this.getShapeAndColor(board, {x: x, y: y});
+                    var leftTop = this.leftTopCoordsOfTile({x: x, y: y})
+                      , icon = this.getShapeAndColor(board, {x: x, y: y});
                     column.add(this.drawIcon(icon, leftTop.x, leftTop.y));
                 }
                 this.icons.add(column);
@@ -223,8 +244,8 @@
             for(var x = 0; x < this.game.boardWidth; x++) {
                 var column = this.add.group();
                 for(var y = 0; y < this.game.boardHeight; y++) {
-                    var leftTop = this.leftTopCoordsOfTile({x: x, y: y});
-                    var tile = this.add.graphics();
+                    var leftTop = this.leftTopCoordsOfTile({x: x, y: y})
+                      , tile = this.add.graphics();
                     tile.beginFill(TILE_COLOR);
                     tile.lineStyle(0, TILE_COLOR, 1);
                     tile.drawRect(leftTop.x, leftTop.y, TILE_SIZE, TILE_SIZE);
@@ -262,7 +283,8 @@
         update: function () {
             var tile = this.getTileAtPixel(this.input.activePointer.worldX,
                                            this.input.activePointer.worldY);
-            if(tile !== null && this.tiles.getAt(tile.x).getAt(tile.y).visible) {
+            if(tile !== null &&
+               this.tiles.getAt(tile.x).getAt(tile.y).visible) {
                 var leftTop = this.leftTopCoordsOfTile(tile);
                 this.marker.x = leftTop.x;
                 this.marker.y = leftTop.y;
@@ -272,8 +294,9 @@
                 this.marker.visible = false;
 
                 // Check if a mouse is over menu button
-                var button = this.getButtonAtPixel(this.input.activePointer.worldX,
-                                                   this.input.activePointer.worldY);
+                var button = this.getButtonAtPixel(
+                    this.input.activePointer.worldX,
+                    this.input.activePointer.worldY);
                 if(button !== null) {
                     //this.buttonIcons.getAt(button).strokeThickness = 2;
                     this.buttonIcons.getAt(button).fill = 'white';
@@ -288,7 +311,8 @@
             var tile = this.getTileAtPixel(this.input.activePointer.worldX,
                                            this.input.activePointer.worldY);
             // Check if the tile is not already flipped
-            if(tile !== null && this.tiles.getAt(tile.x).getAt(tile.y).visible) {
+            if(tile !== null &&
+               this.tiles.getAt(tile.x).getAt(tile.y).visible) {
                 // Set the tile as "revealed"
                 this.tiles.getAt(tile.x).getAt(tile.y).visible = false;
                 this.selectedTiles.push(tile);
@@ -298,8 +322,8 @@
                     this.score++;
                     this.scoreText.setText('Tries\n\n' + this.score);
                     // Check if there is a match between the two icons
-                    var icon1 = this.getShapeAndColor(this.mainBoard, this.selectedTiles[0]);
-                    var icon2 = this.getShapeAndColor(this.mainBoard, tile);
+                    var icon1 = this.getShapeAndColor(this.mainBoard, this.selectedTiles[0])
+                      , icon2 = this.getShapeAndColor(this.mainBoard, tile);
                     if(icon1.shape !== icon2.shape || icon1.color !== icon2.color) {
                         // Icons don't match. Wait half a second and recover up both selections
                         this.input.onDown.remove(this.processClick, this);
@@ -315,10 +339,14 @@
                                 this.bestScore = localStorage.getItem(this.memoryBestScoreText);
                                 if(!this.bestScore || this.bestScore > this.score) {
                                     this.bestScore = this.score;
-                                    localStorage.setItem(this.memoryBestScoreText, this.bestScore);
+                                    localStorage.setItem(this.memoryBestScoreText,
+                                                         this.bestScore);
                                     var text = 'Best\n\n' + this.bestScore;
                                     if(!this.bestText) {
-                                        this.bestText = this.add.text(this.world.width - 15, this.world.height - 50, text, this.textStyle);
+                                        this.bestText = this.add.text(
+                                            this.world.width - 15,
+                                            this.world.height - 50,
+                                            text, this.textStyle);
                                         this.bestText.anchor.set(1.0, 0.5);
                                     } else {
                                         this.bestText.setText(text);
@@ -373,7 +401,7 @@
               , style = { font: ICON_SIZE + 'px FontAwesome',
                           fill: icon.color, align: 'center'}
               , t = this.add.text(x + half, y + half + 5, text, style);
-            t.anchor.set(0.5, 0.5);
+            t.anchor.set(0.5);
             return t;
         }
 

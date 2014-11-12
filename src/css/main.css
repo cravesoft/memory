@@ -10,8 +10,7 @@ html, body {
     background: #000;
 }
 
-.game {
-    width: 640px;
-    height: 480px;
-    margin: 20px auto;
+body {
+    padding: 0px;
+    margin: 0px;
 }
