@@ -33,7 +33,7 @@ gulp.task('clean', function () {
     return stream;
 });
 
-gulp.task('fonts', function() {
+gulp.task('fonts', ['clean'], function() {
     return gulp.src([
         'src/bower_components/font-awesome/fonts/*'])
     .pipe(gulp.dest('dist/fonts/'));
