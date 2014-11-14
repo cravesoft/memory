@@ -105,13 +105,15 @@
                                            this.game.boardWidth + 'x' +
                                            this.game.boardHeight;
                 this.bestScore = localStorage.getItem(this.memoryBestScoreText);
-                if(this.bestScore) {
+                if(this.bestScore !== null) {
                     text = 'Best\n\n' + this.bestScore;
-                    this.bestText = this.add.text(this.world.width - 15,
-                                                  this.world.height - 60, text,
-                                                  this.textStyle);
-                    this.bestText.anchor.set(1.0, 0.5);
+                } else {
+                    text = 'Best\n\n?';
                 }
+                this.bestText = this.add.text(this.world.width - 15,
+                                              this.world.height - 60, text,
+                                              this.textStyle);
+                this.bestText.anchor.set(1.0, 0.5);
             }
 
             this.input.onDown.add(this.processClick, this);
@@ -337,12 +339,14 @@
                             // Update best score ?
                             if(!!localStorage) {
                                 this.bestScore = localStorage.getItem(this.memoryBestScoreText);
-                                if(!this.bestScore || this.bestScore > this.score) {
+                                console.log(this.bestScore);
+                                if(this.bestScore === null || this.bestScore > this.score) {
                                     this.bestScore = this.score;
                                     localStorage.setItem(this.memoryBestScoreText,
                                                          this.bestScore);
                                     var text = 'Best\n\n' + this.bestScore;
-                                    if(!this.bestText) {
+                                    console.log(this.bestText);
+                                    if(this.bestText === undefined) {
                                         this.bestText = this.add.text(
                                             this.world.width - 15,
                                             this.world.height - 50,
