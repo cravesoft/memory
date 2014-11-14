@@ -1,13 +1,13 @@
 (function() {
     'use strict';
 
-    var TILE_SIZE = 70 // Size of tile height & width in pixels
+    var TILE_SIZE = 90 // Size of tile height & width in pixels
       , GAP_SIZE = 10 // Size of gap between tiles in pixels
       , HALF_GAP_SIZE = GAP_SIZE * 0.5
       , TILE_GAP_SIZE = TILE_SIZE + GAP_SIZE
-      , ICON_SIZE = 50
+      , ICON_SIZE = 70
       , MARKER_SIZE = 4
-      , BUTTON_SIZE = 60
+      , BUTTON_SIZE = 70
       , BUTTON_MARGIN = 10
       , TILE_COLOR = 0xffffff // White
       , HIGHLIGHT_COLOR = 0x00ff00 // Green
