@@ -7,14 +7,15 @@
       , TILE_GAP_SIZE = TILE_SIZE + GAP_SIZE
       , TILE_COLOR = 0xffffff // White
       , HIGHLIGHT_COLOR = 0x00ff00 // Green
-      , ICON_SIZE = 120
+      , ICON_SIZE = 100
       , ICON_MARGIN = 10
       , ICON_SHAPE = '\uf128' // Question
       , TITLE_Y = 170
       , INSTRUCTIONS_Y = 280
       , SMALL_BOARD_SIZE = 4
       , MEDIUM_BOARD_SIZE = 6
-      , LARGE_BOARD_SIZE = 8
+      , LARGE_BOARD_WIDTH = 10
+      , LARGE_BOARD_HEIGHT = 7
       , MARKER_SIZE = 4;
 
     function Menu() {
@@ -37,14 +38,13 @@
             t.anchor.set(0.5);
 
             this.ymargin = this.world.height * 0.5;
-            var half = this.world.width * 0.5
-              , quarter = half * 0.5;
+            var size = this.world.width * 0.25;
 
-            this.boards = [];
-            this.drawAndPositionBoard(SMALL_BOARD_SIZE, 0);
-            this.drawAndPositionBoard(MEDIUM_BOARD_SIZE, quarter);
-            this.drawAndPositionBoard(LARGE_BOARD_SIZE, half);
-            this.drawAndPositionIcon(ICON_SIZE, half + quarter);
+            this.game.boards = [];
+            this.drawAndPositionBoard(SMALL_BOARD_SIZE, SMALL_BOARD_SIZE, 0);
+            this.drawAndPositionBoard(MEDIUM_BOARD_SIZE, MEDIUM_BOARD_SIZE, size * 1);
+            this.drawAndPositionBoard(LARGE_BOARD_WIDTH, LARGE_BOARD_HEIGHT, size * 2);
+            this.drawAndPositionIcon(ICON_SIZE, size * 3);
 
             this.marker = this.add.graphics();
 
@@ -65,19 +65,20 @@
             return tile;
         },
 
-        drawAndPositionBoard: function(width, x) {
-            var size = width * TILE_GAP_SIZE
-              , xmargin = x + parseInt((this.world.width * 0.25 - size) * 0.5)
-              , board3 = this.drawBoard(width, width);
+        drawAndPositionBoard: function(width, height, x) {
+            var sizex = width * TILE_GAP_SIZE
+              , sizey = height * TILE_GAP_SIZE
+              , xmargin = x + parseInt((this.world.width * 0.25 - sizex) * 0.5)
+              , board3 = this.drawBoard(width, height);
             board3.x = xmargin;
             board3.y = this.ymargin;
-            this.boards.push(new Phaser.Rectangle(xmargin, this.ymargin, size, size));
+            this.game.boards.push(new Phaser.Rectangle(xmargin, this.ymargin, sizex, sizey));
             if(!!localStorage) {
                 var bestScore = localStorage.getItem('memory.bestScore' + width + 'x' + width);
                 if(bestScore) {
                     var text = 'Best\n\n' + bestScore
-                      , t = this.add.text(xmargin + size * 0.5,
-                            this.ymargin + size + 30, text,
+                      , t = this.add.text(xmargin + sizex * 0.5,
+                            this.ymargin + sizey + 30, text,
                             { font: '30px Arial', fill: '#ffffff',
                               align: 'center' });
                     t.anchor.set(0.5, 0);
@@ -99,7 +100,7 @@
             var size = width
               , xmargin = x + parseInt((this.world.width * 0.25 - size) * 0.5);
             this.drawIcon({shape: ICON_SHAPE, color: '#ffffff'}, xmargin, this.ymargin);
-            this.boards.push(new Phaser.Rectangle(xmargin, this.ymargin, size, size));
+            this.game.boards.push(new Phaser.Rectangle(xmargin, this.ymargin, size, size));
         },
 
         leftTopCoordsOfTile: function(tile) {
@@ -129,17 +130,17 @@
         },
 
         getBoardAtPixel: function(x, y) {
-            for(var i = 0; i < this.boards.length; i++) {
-                if(this.boards[i].contains(x, y)) {
-                    return this.boards[i];
+            for(var i = 0; i < this.game.boards.length; i++) {
+                if(this.game.boards[i].contains(x, y)) {
+                    return this.game.boards[i];
                 }
             }
             return null;
         },
 
         getBoardIdxAtPixel: function(x, y) {
-            for(var i = 0; i < this.boards.length; i++) {
-                if(this.boards[i].contains(x, y)) {
+            for(var i = 0; i < this.game.boards.length; i++) {
+                if(this.game.boards[i].contains(x, y)) {
                     return i;
                 }
             }
@@ -151,19 +152,19 @@
                                               this.input.activePointer.worldY);
             if(idx !== null) {
                 if(idx === 0) {
+                    this.game.randomBoard = false;
                     this.game.boardWidth = SMALL_BOARD_SIZE;
                     this.game.boardHeight = SMALL_BOARD_SIZE;
                 } else if(idx === 1) {
+                    this.game.randomBoard = false;
                     this.game.boardWidth = MEDIUM_BOARD_SIZE;
                     this.game.boardHeight = MEDIUM_BOARD_SIZE;
                 } else if(idx === 2) {
-                    this.game.boardWidth = LARGE_BOARD_SIZE;
-                    this.game.boardHeight = LARGE_BOARD_SIZE;
+                    this.game.randomBoard = false;
+                    this.game.boardWidth = LARGE_BOARD_WIDTH;
+                    this.game.boardHeight = LARGE_BOARD_HEIGHT;
                 } else if(idx === 3) {
-                    var even = [2, 4, 6, 8]
-                      , all = even.concat([1, 3, 5, 7]);
-                    this.game.boardWidth = Phaser.Math.getRandom(even, 0, even.length);
-                    this.game.boardHeight = Phaser.Math.getRandom(all, 0, all.length);
+                    this.game.randomBoard = true;
                 }
                 this.game.state.start('game');
             }

@@ -9,6 +9,10 @@
       , MARKER_SIZE = 4
       , BUTTON_SIZE = 70
       , BUTTON_MARGIN = 10
+      , MIN_BOARD_WIDTH = 1
+      , MAX_BOARD_WIDTH = 10
+      , MIN_BOARD_HEIGHT = 1
+      , MAX_BOARD_HEIGHT = 7
       , TILE_COLOR = 0xffffff // White
       , HIGHLIGHT_COLOR = 0x00ff00 // Green
       , RED         = '#ff0000'
@@ -72,15 +76,11 @@
     Game.prototype = {
 
         create: function () {
-            this.xmargin = parseInt((this.world.width - (this.game.boardWidth *
-                                    TILE_GAP_SIZE)) * 0.5);
-            this.ymargin = parseInt((this.world.height -
-                                     (this.game.boardHeight * TILE_GAP_SIZE)) *
-                                    0.5);
-            this.borderLeft = this.xmargin + HALF_GAP_SIZE;
-            this.borderRight = this.world.width - this.xmargin - HALF_GAP_SIZE;
-            this.borderTop = this.ymargin + HALF_GAP_SIZE;
-            this.borderBottom = this.world.height - this.ymargin - HALF_GAP_SIZE;
+            if(this.game.randomBoard) {
+                this.setRandomSize();
+            }
+            this.setMargins();
+
             this.background = this.add.tileSprite(0, 0, this.world.width,
                                                   this.world.height,
                                                   'background');
@@ -117,6 +117,31 @@
             }
 
             this.input.onDown.add(this.processClick, this);
+        },
+
+        setRandomSize: function () {
+            var width = Math.floor(Math.random() * (MAX_BOARD_WIDTH + 1 - MIN_BOARD_WIDTH)) + MIN_BOARD_WIDTH;
+            var height;
+            if(width % 2) {
+                height = Math.floor(Math.random() * (Math.floor(MAX_BOARD_HEIGHT * 0.5) + 1 - Math.ceil(MIN_BOARD_WIDTH * 0.5))) + Math.ceil(MIN_BOARD_WIDTH * 0.5);
+                height = height * 2;
+            } else {
+                height = Math.floor(Math.random() * (MAX_BOARD_HEIGHT + 1 - MIN_BOARD_HEIGHT)) + MIN_BOARD_HEIGHT;
+            }
+            this.game.boardWidth = width;
+            this.game.boardHeight = height;
+        },
+
+        setMargins: function () {
+            this.xmargin = parseInt((this.world.width - (this.game.boardWidth *
+                                    TILE_GAP_SIZE)) * 0.5);
+            this.ymargin = parseInt((this.world.height -
+                                     (this.game.boardHeight * TILE_GAP_SIZE)) *
+                                    0.5);
+            this.borderLeft = this.xmargin + HALF_GAP_SIZE;
+            this.borderRight = this.world.width - this.xmargin - HALF_GAP_SIZE;
+            this.borderTop = this.ymargin + HALF_GAP_SIZE;
+            this.borderBottom = this.world.height - this.ymargin - HALF_GAP_SIZE;
         },
 
         createMenu: function () {
@@ -164,11 +189,32 @@
         },
 
         resetBoard: function () {
-            this.mainBoard = this.getRandomizedBoard();
+            this.selectedTiles = [];
             this.icons.destroy();
-            this.drawIcons(this.mainBoard);
-            this.tiles.setAllChildren('visible', true);
-            this.world.bringToTop(this.tiles);
+            if(this.game.randomBoard) {
+                this.setRandomSize();
+                this.setMargins();
+                this.tiles.destroy();
+                this.createBoard();
+                if(!!localStorage) {
+                    this.memoryBestScoreText = 'memory.bestScore' +
+                                               this.game.boardWidth + 'x' +
+                                               this.game.boardHeight;
+                    this.bestScore = localStorage.getItem(this.memoryBestScoreText);
+                    var text;
+                    if(this.bestScore !== null) {
+                        text = 'Best\n\n' + this.bestScore;
+                    } else {
+                        text = 'Best\n\n?';
+                    }
+                    this.bestText.setText(text);
+                }
+            } else {
+                this.mainBoard = this.getRandomizedBoard();
+                this.drawIcons(this.mainBoard);
+                this.tiles.setAllChildren('visible', true);
+                this.world.bringToTop(this.tiles);
+            }
             this.score = 0;
             this.scoreText.setText('Tries\n\n' + this.score);
         },
@@ -339,22 +385,12 @@
                             // Update best score ?
                             if(!!localStorage) {
                                 this.bestScore = localStorage.getItem(this.memoryBestScoreText);
-                                console.log(this.bestScore);
                                 if(this.bestScore === null || this.bestScore > this.score) {
                                     this.bestScore = this.score;
                                     localStorage.setItem(this.memoryBestScoreText,
                                                          this.bestScore);
                                     var text = 'Best\n\n' + this.bestScore;
-                                    console.log(this.bestText);
-                                    if(this.bestText === undefined) {
-                                        this.bestText = this.add.text(
-                                            this.world.width - 15,
-                                            this.world.height - 50,
-                                            text, this.textStyle);
-                                        this.bestText.anchor.set(1.0, 0.5);
-                                    } else {
-                                        this.bestText.setText(text);
-                                    }
+                                    this.bestText.setText(text);
                                 }
                             }
                         }
