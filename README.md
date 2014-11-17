@@ -9,3 +9,7 @@ You need to have [node.js](http://nodejs.org/) installed on your machine.
   $ gulp
   $ open http://localhost:9000
   ```
+
+Font Awesome by Dave Gandy - [http://fontawesome.io](http://fontawesome.io)
+
+Background pattern from [subtlepatterns.com](http://subtlepatterns.com)
