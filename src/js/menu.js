@@ -2,6 +2,7 @@
     'use strict';
 
     var TILE_SIZE = 20 // Size of tile height & width in pixels
+      , TILE_RADIUS = 3
       , GAP_SIZE = 4 // Size of gap between tiles in pixels
       , HALF_GAP_SIZE = GAP_SIZE * 0.5
       , TILE_GAP_SIZE = TILE_SIZE + GAP_SIZE
@@ -58,7 +59,7 @@
                     var leftTop = this.leftTopCoordsOfTile({x: x, y: y});
                     tile.beginFill(TILE_COLOR);
                     tile.lineStyle(0, TILE_COLOR, 1);
-                    tile.drawRect(leftTop.x, leftTop.y, TILE_SIZE, TILE_SIZE);
+                    tile.drawRoundedRect(leftTop.x, leftTop.y, TILE_SIZE, TILE_SIZE, TILE_RADIUS);
                     tile.endFill();
                 }
             }
@@ -119,9 +120,9 @@
                 this.marker.y = board.y;
                 this.marker.clear();
                 this.marker.lineStyle(MARKER_SIZE, HIGHLIGHT_COLOR, 1);
-                this.marker.drawRect(-MARKER_SIZE * 0.5, -MARKER_SIZE * 0.5,
+                this.marker.drawRoundedRect(-MARKER_SIZE * 0.5, -MARKER_SIZE * 0.5,
                                      board.width + MARKER_SIZE,
-                                     board.height + MARKER_SIZE);
+                                     board.height + MARKER_SIZE, TILE_RADIUS);
                 this.marker.visible = true;
             }
             else {

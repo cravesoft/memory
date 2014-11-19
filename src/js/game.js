@@ -2,11 +2,13 @@
     'use strict';
 
     var TILE_SIZE = 90 // Size of tile height & width in pixels
+      , TILE_RADIUS = 10
       , GAP_SIZE = 10 // Size of gap between tiles in pixels
       , HALF_GAP_SIZE = GAP_SIZE * 0.5
       , TILE_GAP_SIZE = TILE_SIZE + GAP_SIZE
       , ICON_SIZE = 70
       , MARKER_SIZE = 4
+      , MARKER_RADIUS = TILE_RADIUS
       , BUTTON_SIZE = 70
       , BUTTON_MARGIN = 10
       , MIN_BOARD_WIDTH = 1
@@ -89,9 +91,9 @@
             this.createMenu();
             this.marker = this.add.graphics();
             this.marker.lineStyle(MARKER_SIZE, HIGHLIGHT_COLOR, 1);
-            this.marker.drawRect(-MARKER_SIZE * 0.5, -MARKER_SIZE * 0.5,
-                                 TILE_SIZE + MARKER_SIZE,
-                                 TILE_SIZE + MARKER_SIZE);
+            this.marker.drawRoundedRect(-MARKER_SIZE * 0.25, -MARKER_SIZE * 0.25,
+                                        TILE_SIZE + MARKER_SIZE * 0.5,
+                                        TILE_SIZE + MARKER_SIZE * 0.5, MARKER_RADIUS);
 
             this.score = 0;
             var text = 'Tries\n\n' + this.score;
@@ -212,7 +214,11 @@
             } else {
                 this.mainBoard = this.getRandomizedBoard();
                 this.drawIcons(this.mainBoard);
-                this.tiles.setAllChildren('visible', true);
+                this.tiles.setAllChildren('revealed', false);
+                this.tiles.setAllChildren('scale.x', 1);
+                this.tiles.setAllChildren('scale.y', 1);
+                this.tiles.setAllChildren('x', 0);
+                this.tiles.setAllChildren('y', 0);
                 this.world.bringToTop(this.tiles);
             }
             this.score = 0;
@@ -296,8 +302,9 @@
                       , tile = this.add.graphics();
                     tile.beginFill(TILE_COLOR);
                     tile.lineStyle(0, TILE_COLOR, 1);
-                    tile.drawRect(leftTop.x, leftTop.y, TILE_SIZE, TILE_SIZE);
+                    tile.drawRoundedRect(leftTop.x, leftTop.y, TILE_SIZE, TILE_SIZE, TILE_RADIUS);
                     tile.endFill();
+                    tile.revealed = false;
                     column.add(tile);
                 }
                 this.tiles.add(column);
@@ -332,7 +339,7 @@
             var tile = this.getTileAtPixel(this.input.activePointer.worldX,
                                            this.input.activePointer.worldY);
             if(tile !== null &&
-               this.tiles.getAt(tile.x).getAt(tile.y).visible) {
+               !this.tiles.getAt(tile.x).getAt(tile.y).revealed) {
                 var leftTop = this.leftTopCoordsOfTile(tile);
                 this.marker.x = leftTop.x;
                 this.marker.y = leftTop.y;
@@ -346,10 +353,8 @@
                     this.input.activePointer.worldX,
                     this.input.activePointer.worldY);
                 if(button !== null) {
-                    //this.buttonIcons.getAt(button).strokeThickness = 2;
                     this.buttonIcons.getAt(button).fill = 'white';
                 } else {
-                    //this.buttonIcons.setAllChildren('strokeThickness', 0);
                     this.buttonIcons.setAllChildren('fill', 'gray');
                 }
             }
@@ -359,10 +364,16 @@
             var tile = this.getTileAtPixel(this.input.activePointer.worldX,
                                            this.input.activePointer.worldY);
             // Check if the tile is not already flipped
-            if(tile !== null &&
-               this.tiles.getAt(tile.x).getAt(tile.y).visible) {
+            if(tile !== null && !this.tiles.getAt(tile.x).getAt(tile.y).revealed) {
+                var selectedTile = this.tiles.getAt(tile.x).getAt(tile.y);
                 // Set the tile as "revealed"
-                this.tiles.getAt(tile.x).getAt(tile.y).visible = false;
+                selectedTile.revealed = true;
+                var leftTop = this.leftTopCoordsOfTile({x: tile.x, y: tile.y});
+                this.add.tween(selectedTile.scale).to({x: 0, y: 0}, 100,
+                                                      Phaser.Easing.Exponential.Out, true);
+                this.add.tween(selectedTile).to({x: leftTop.x + TILE_SIZE * 0.5,
+                                                 y: leftTop.y + TILE_SIZE * 0.5},
+                                                 100, Phaser.Easing.Exponential.Out, true);
                 this.selectedTiles.push(tile);
                 if(this.selectedTiles.length > 1) {
                     // The current tile was the second tile clicked
@@ -413,8 +424,11 @@
 
         resetSelection: function () {
             for(var i = 0; i < this.selectedTiles.length; i++) {
-                this.tiles.getAt(this.selectedTiles[i].x)
-                          .getAt(this.selectedTiles[i].y).visible = true;
+                var tile = this.tiles.getAt(this.selectedTiles[i].x)
+                                     .getAt(this.selectedTiles[i].y);
+                tile.revealed = false;
+                this.add.tween(tile.scale).to({ x: 1, y: 1}, 100, Phaser.Easing.Exponential.In, true);
+                this.add.tween(tile).to({ x: 0, y: 0}, 100, Phaser.Easing.Exponential.In, true);
             }
             this.selectedTiles = []; // Reset variable
             this.input.onDown.add(this.processClick, this);
@@ -424,7 +438,7 @@
             // Returns true if all the tiles have been revealed, otherwise false
             for(var x = 0; x < this.game.boardWidth; x++) {
                 for(var y = 0; y < this.game.boardHeight; y++) {
-                    if(this.tiles.getAt(x).getAt(y).visible) {
+                    if(!this.tiles.getAt(x).getAt(y).revealed) {
                         return false; // Return false if any tiles are covered
                     }
                 }
