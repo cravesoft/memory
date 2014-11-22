@@ -35,7 +35,7 @@ gulp.task('clean', function () {
 
 gulp.task('fonts', ['clean'], function() {
     return gulp.src([
-        'src/bower_components/font-awesome/fonts/*'])
+        'src/bower_components/font-awesome/fonts/fontawesome-webfont.*'])
     .pipe(gulp.dest('dist/fonts/'));
 });
 
