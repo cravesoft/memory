@@ -8,9 +8,10 @@
       , TILE_GAP_SIZE = TILE_SIZE + GAP_SIZE
       , TILE_COLOR = 0xffffff // White
       , HIGHLIGHT_COLOR = 0x00ff00 // Green
-      , ICON_SIZE = 100
-      , ICON_MARGIN = 10
-      , ICON_SHAPE = '\uf128' // Question
+      , MIN_BOARD_WIDTH = 2
+      , MAX_BOARD_WIDTH = 10
+      , MIN_BOARD_HEIGHT = 2
+      , MAX_BOARD_HEIGHT = 7
       , TITLE_Y = 170
       , INSTRUCTIONS_Y = 280
       , SMALL_BOARD_SIZE = 4
@@ -23,6 +24,10 @@
     }
 
     Menu.prototype = {
+
+        init: function () {
+            this.randomBoard = null;
+        },
 
         create: function () {
             this.background = this.add.tileSprite(0, 0, this.world.width,
@@ -39,69 +44,83 @@
             t.anchor.set(0.5);
 
             this.ymargin = this.world.height * 0.5;
-            var size = this.world.width * 0.25;
+            var size = (this.world.width - (SMALL_BOARD_SIZE + MEDIUM_BOARD_SIZE + LARGE_BOARD_WIDTH * 2) * TILE_GAP_SIZE) / 5;
+            //var size = this.world.width * 0.25;
 
             this.game.boards = [];
-            this.drawAndPositionBoard(SMALL_BOARD_SIZE, SMALL_BOARD_SIZE, 0);
-            this.drawAndPositionBoard(MEDIUM_BOARD_SIZE, MEDIUM_BOARD_SIZE, size * 1);
-            this.drawAndPositionBoard(LARGE_BOARD_WIDTH, LARGE_BOARD_HEIGHT, size * 2);
-            this.drawAndPositionIcon(ICON_SIZE, size * 3);
+            this.drawAndPositionBoard(SMALL_BOARD_SIZE, SMALL_BOARD_SIZE, size);
+            this.drawAndPositionBoard(MEDIUM_BOARD_SIZE, MEDIUM_BOARD_SIZE, size * 2 + SMALL_BOARD_SIZE * TILE_GAP_SIZE);
+            this.drawAndPositionBoard(LARGE_BOARD_WIDTH, LARGE_BOARD_HEIGHT, size * 3 + (SMALL_BOARD_SIZE + MEDIUM_BOARD_SIZE) * TILE_GAP_SIZE);
+            this.drawAndPositionRandomBoard(size * 4 + (SMALL_BOARD_SIZE + MEDIUM_BOARD_SIZE + LARGE_BOARD_WIDTH) * TILE_GAP_SIZE);
+            this.time.events.loop(Phaser.Timer.SECOND * 0.5,
+                                  this.drawAndPositionRandomBoard, this, size * 4 + (SMALL_BOARD_SIZE + MEDIUM_BOARD_SIZE + LARGE_BOARD_WIDTH) * TILE_GAP_SIZE);
+            t = this.add.text(size * 4 + (SMALL_BOARD_SIZE + MEDIUM_BOARD_SIZE + LARGE_BOARD_WIDTH * 1.5) * TILE_GAP_SIZE, this.ymargin +
+                              (LARGE_BOARD_HEIGHT * TILE_GAP_SIZE) + 30,
+                              'Random', { font: '30px Arial', fill: '#ffffff',
+                                          align: 'center' });
+            t.anchor.set(0.5, 0);
 
             this.marker = this.add.graphics();
 
             this.input.onDown.add(this.onDown, this);
         },
 
-        drawBoard: function(width, height) {
-            var tile = this.add.graphics();
-            for(var x = 0; x < width; x++) {
-                for(var y = 0; y < height; y++) {
-                    var leftTop = this.leftTopCoordsOfTile({x: x, y: y});
-                    tile.beginFill(TILE_COLOR);
-                    tile.lineStyle(0, TILE_COLOR, 1);
-                    tile.drawRoundedRect(leftTop.x, leftTop.y, TILE_SIZE, TILE_SIZE, TILE_RADIUS);
-                    tile.endFill();
+        drawBoard: function(x, y, width, height) {
+            var board = this.add.graphics();
+            for(var i = 0; i < width; i++) {
+                for(var j = 0; j < height; j++) {
+                    var leftTop = this.leftTopCoordsOfTile({x: i, y: j});
+                    board.beginFill(TILE_COLOR);
+                    board.lineStyle(0, TILE_COLOR, 1);
+                    board.drawRoundedRect(leftTop.x, leftTop.y, TILE_SIZE, TILE_SIZE, TILE_RADIUS);
+                    board.endFill();
                 }
             }
-            return tile;
+            board.x = x;
+            board.y = y;
+            return board;
         },
 
         drawAndPositionBoard: function(width, height, x) {
             var sizex = width * TILE_GAP_SIZE
               , sizey = height * TILE_GAP_SIZE
-              , xmargin = x + parseInt((this.world.width * 0.25 - sizex) * 0.5)
-              , board3 = this.drawBoard(width, height);
-            board3.x = xmargin;
-            board3.y = this.ymargin;
-            this.game.boards.push(new Phaser.Rectangle(xmargin, this.ymargin, sizex, sizey));
+              , xmargin = x/* + parseInt((this.world.width * 0.25 - sizex) * 0.5)*/;
+            this.drawBoard(xmargin, this.ymargin + (LARGE_BOARD_HEIGHT * TILE_GAP_SIZE - sizey) * 0.5, width, height);
+            this.game.boards.push(new Phaser.Rectangle(xmargin, this.ymargin + (LARGE_BOARD_HEIGHT * TILE_GAP_SIZE - sizey) * 0.5, sizex, sizey));
+            this.drawBestScore(xmargin + sizex * 0.5, this.ymargin + LARGE_BOARD_HEIGHT * TILE_GAP_SIZE + 30, width);
+        },
+
+        drawBestScore: function(x, y, width) {
             if(!!localStorage) {
                 var bestScore = localStorage.getItem('memory.bestScore' + width + 'x' + width);
                 if(bestScore) {
                     var text = 'Best\n\n' + bestScore
-                      , t = this.add.text(xmargin + sizex * 0.5,
-                            this.ymargin + sizey + 30, text,
-                            { font: '30px Arial', fill: '#ffffff',
-                              align: 'center' });
+                      , t = this.add.text(x, y, text, { font: '30px Arial',
+                                                        fill: '#ffffff',
+                                                        align: 'center' });
                     t.anchor.set(0.5, 0);
                 }
             }
         },
 
-        drawIcon: function(icon, x, y) {
-            var half = parseInt(ICON_SIZE * 0.5)
-              , text = icon.shape
-              , style = { font: (ICON_SIZE - ICON_MARGIN) + 'px FontAwesome',
-                          fill: icon.color, align: 'center'}
-              , t = this.add.text(x + half, y + half + 5, text, style);
-            t.anchor.set(0.5);
-            return t;
-        },
-
-        drawAndPositionIcon: function(width, x) {
-            var size = width
-              , xmargin = x + parseInt((this.world.width * 0.25 - size) * 0.5);
-            this.drawIcon({shape: ICON_SHAPE, color: '#ffffff'}, xmargin, this.ymargin);
-            this.game.boards.push(new Phaser.Rectangle(xmargin, this.ymargin, size, size));
+        drawAndPositionRandomBoard: function(x) {
+            if(this.randomBoard !== null) {
+                this.randomBoard.destroy();
+                this.game.boards.pop();
+            }
+            var width = Math.floor(Math.random() * (MAX_BOARD_WIDTH + 1 - MIN_BOARD_WIDTH)) + MIN_BOARD_WIDTH;
+            var height;
+            if(width % 2) {
+                height = Math.floor(Math.random() * (Math.floor(MAX_BOARD_HEIGHT * 0.5) + 1 - Math.ceil(MIN_BOARD_WIDTH * 0.5))) + Math.ceil(MIN_BOARD_WIDTH * 0.5);
+                height = height * 2;
+            } else {
+                height = Math.floor(Math.random() * (MAX_BOARD_HEIGHT + 1 - MIN_BOARD_HEIGHT)) + MIN_BOARD_HEIGHT;
+            }
+            var sizex = width * TILE_GAP_SIZE
+              , sizey = height * TILE_GAP_SIZE
+              , xmargin = x;
+            this.game.boards.push(new Phaser.Rectangle(xmargin + (LARGE_BOARD_WIDTH * TILE_GAP_SIZE - sizex) * 0.5, this.ymargin + (LARGE_BOARD_HEIGHT * TILE_GAP_SIZE - sizey) * 0.5, sizex, sizey));
+            this.randomBoard = this.drawBoard(xmargin + (LARGE_BOARD_WIDTH * TILE_GAP_SIZE - sizex) * 0.5, this.ymargin + (LARGE_BOARD_HEIGHT * TILE_GAP_SIZE - sizey) * 0.5, width, height);
         },
 
         leftTopCoordsOfTile: function(tile) {
