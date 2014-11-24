@@ -11,9 +11,9 @@
       , MARKER_RADIUS = TILE_RADIUS
       , BUTTON_SIZE = 70
       , BUTTON_MARGIN = 10
-      , MIN_BOARD_WIDTH = 1
+      , MIN_BOARD_WIDTH = 2
       , MAX_BOARD_WIDTH = 10
-      , MIN_BOARD_HEIGHT = 1
+      , MIN_BOARD_HEIGHT = 2
       , MAX_BOARD_HEIGHT = 7
       , TILE_COLOR = 0xffffff // White
       , HIGHLIGHT_COLOR = 0x00ff00 // Green
