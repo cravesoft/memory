@@ -17,6 +17,13 @@
       , MAX_BOARD_HEIGHT = 7
       , TILE_COLOR = 0xffffff // White
       , HIGHLIGHT_COLOR = 0x00ff00 // Green
+      , REVEAL_DELAY = 0.6 // 0.6 second
+      , GAMEOVER_DELAY = 2.0 // 2 seconds
+      , FADE_IN_DELAY = 300 // 300 milliseconds
+      , FADE_OUT_DELAY = 200 // 200 milliseconds
+      , MIN_FADE_OUT_DELAY = 500 // 600 milliseconds
+      , MAX_FADE_OUT_DELAY = 1000 // 800 milliseconds
+      , SHAKE_DELAY = 50 // 50 milliseconds
       , RED         = '#ff0000'
       , GREEN       = '#00ff00'
       , BLUE        = '#0086ff'
@@ -190,8 +197,36 @@
             this.drawTiles();
         },
 
-        resetBoard: function () {
+        removeBoard: function () {
             this.selectedTiles = [];
+            this.numTiles = 0;
+            this.input.onDown.remove(this.processClick, this);
+            for(var x = 0; x < this.game.boardWidth; x++) {
+                for(var y = 0; y < this.game.boardHeight; y++) {
+                    var tile = this.tiles.getAt(x).getAt(y);
+                    if(!tile.revealed) {
+                        this.numTiles++;
+                        var leftTop = this.leftTopCoordsOfTile({x: x, y: y});
+                        var delay = Math.floor(Math.random() * (MAX_FADE_OUT_DELAY - MIN_FADE_OUT_DELAY + 1) + MIN_FADE_OUT_DELAY);
+                        this.add.tween(tile.scale).to({x: 0, y: 0}, delay,
+                                                       Phaser.Easing.Exponential.InOut, true);
+                        this.add.tween(tile).to({x: leftTop.x + TILE_SIZE * 0.5,
+                                                 y: leftTop.y + TILE_SIZE * 0.5},
+                                                 delay, Phaser.Easing.Exponential.InOut, true)
+                            .onComplete.add(function () {
+                                if(--this.numTiles === 0) {
+                                    this.resetBoard();
+                                }
+                            }, this);
+                    }
+                }
+            }
+            if(this.numTiles === 0) {
+                this.resetBoard();
+            }
+        },
+
+        resetBoard: function () {
             this.icons.destroy();
             if(this.game.randomBoard) {
                 this.setRandomSize();
@@ -223,6 +258,7 @@
             }
             this.score = 0;
             this.scoreText.setText('Tries\n\n' + this.score);
+            this.input.onDown.add(this.processClick, this);
         },
 
         getRandomizedBoard: function () {
@@ -364,49 +400,69 @@
             var tile = this.getTileAtPixel(this.input.activePointer.worldX,
                                            this.input.activePointer.worldY);
             // Check if the tile is not already flipped
-            if(tile !== null && !this.tiles.getAt(tile.x).getAt(tile.y).revealed) {
-                var selectedTile = this.tiles.getAt(tile.x).getAt(tile.y);
-                // Set the tile as "revealed"
-                selectedTile.revealed = true;
-                var leftTop = this.leftTopCoordsOfTile({x: tile.x, y: tile.y});
-                this.add.tween(selectedTile.scale).to({x: 0, y: 0}, 100,
-                                                      Phaser.Easing.Exponential.Out, true);
-                this.add.tween(selectedTile).to({x: leftTop.x + TILE_SIZE * 0.5,
-                                                 y: leftTop.y + TILE_SIZE * 0.5},
-                                                 100, Phaser.Easing.Exponential.Out, true);
-                this.selectedTiles.push(tile);
-                if(this.selectedTiles.length > 1) {
-                    // The current tile was the second tile clicked
-                    // Update score
-                    this.score++;
-                    this.scoreText.setText('Tries\n\n' + this.score);
-                    // Check if there is a match between the two icons
-                    var icon1 = this.getShapeAndColor(this.mainBoard, this.selectedTiles[0])
-                      , icon2 = this.getShapeAndColor(this.mainBoard, tile);
-                    if(icon1.shape !== icon2.shape || icon1.color !== icon2.color) {
-                        // Icons don't match. Wait half a second and recover up both selections
-                        this.input.onDown.remove(this.processClick, this);
-                        this.time.events.add(Phaser.Timer.SECOND * 0.5,
-                                             this.resetSelection, this);
-                    } else {
-                        if(this.hasWon()) { // Check if all pairs found
-                            // Show the fully unrevealed board for two seconds
-                            this.time.events.add(Phaser.Timer.SECOND * 2.0,
-                                                 this.resetBoard, this);
-                            // Update best score ?
-                            if(!!localStorage) {
-                                this.bestScore = localStorage.getItem(this.memoryBestScoreText);
-                                if(this.bestScore === null || this.bestScore > this.score) {
-                                    this.bestScore = this.score;
-                                    localStorage.setItem(this.memoryBestScoreText,
-                                                         this.bestScore);
-                                    var text = 'Best\n\n' + this.bestScore;
-                                    this.bestText.setText(text);
+            if(tile !== null) {
+                if(!this.tiles.getAt(tile.x).getAt(tile.y).revealed) {
+                    var selectedTile = this.tiles.getAt(tile.x).getAt(tile.y);
+                    // Set the tile as "revealed"
+                    selectedTile.revealed = true;
+                    var leftTop = this.leftTopCoordsOfTile({x: tile.x, y: tile.y});
+                    this.add.tween(selectedTile.scale).to({x: 0, y: 0}, FADE_OUT_DELAY,
+                                                          Phaser.Easing.Linear.Out, true);
+                    this.add.tween(selectedTile).to({x: leftTop.x + TILE_SIZE * 0.5,
+                                                     y: leftTop.y + TILE_SIZE * 0.5},
+                                                     FADE_OUT_DELAY, Phaser.Easing.Linear.Out, true);
+                    this.selectedTiles.push(tile);
+                    if(this.selectedTiles.length > 1) {
+                        // The current tile was the second tile clicked
+                        // Update score
+                        this.score++;
+                        this.scoreText.setText('Tries\n\n' + this.score);
+                        // Check if there is a match between the two icons
+                        var icon1 = this.getShapeAndColor(this.mainBoard, this.selectedTiles[0])
+                          , icon2 = this.getShapeAndColor(this.mainBoard, tile);
+                        if(icon1.shape !== icon2.shape || icon1.color !== icon2.color) {
+                            // Icons don't match. Wait and hide both icons
+                            this.input.onDown.remove(this.processClick, this);
+                            this.time.events.add(Phaser.Timer.SECOND * REVEAL_DELAY,
+                                                 this.hideIcons, this);
+                        } else {
+                            if(this.hasWon()) { // Check if all pairs found
+                                // Show the fully unrevealed board for a few seconds
+                                this.time.events.add(Phaser.Timer.SECOND * GAMEOVER_DELAY,
+                                                     this.removeBoard, this);
+                                // Update best score ?
+                                if(!!localStorage) {
+                                    this.bestScore = localStorage.getItem(this.memoryBestScoreText);
+                                    if(this.bestScore === null || this.bestScore > this.score) {
+                                        this.bestScore = this.score;
+                                        localStorage.setItem(this.memoryBestScoreText,
+                                                             this.bestScore);
+                                        var text = 'Best\n\n' + this.bestScore;
+                                        this.bestText.setText(text);
+                                    }
                                 }
                             }
+                            this.selectedTiles = []; // Reset variable
                         }
-                        this.selectedTiles = []; // Reset variable
                     }
+                } else {
+                    // Tile is already flipped
+                    // Shake icon
+                    var icon = this.icons.getAt(tile.x).getAt(tile.y);
+                    this.input.onDown.remove(this.processClick, this);
+                    this.add.tween(icon).to({x: icon.x - 10}, SHAKE_DELAY,
+                                            Phaser.Easing.Quadratic.InOut, true)
+                        .onComplete.add(function () {
+                            this.add.tween(icon).to({x: icon.x + 20}, SHAKE_DELAY,
+                                                    Phaser.Easing.Quadratic.InOut, true, 0, 4, true)
+                                .onComplete.add(function () {
+                                    this.add.tween(icon).to({x: icon.x - 10}, SHAKE_DELAY,
+                                                            Phaser.Easing.Quadratic.InOut, true)
+                                        .onComplete.add(function () {
+                                            this.input.onDown.add(this.processClick, this);
+                                        }, this);
+                                }, this);
+                        }, this);
                 }
             } else {
                 // Check if a menu button is clicked
@@ -416,22 +472,25 @@
                     if(button === 0) {
                         this.game.state.start('menu');
                     } else {
-                        this.resetBoard();
+                        this.removeBoard();
                     }
                 }
             }
         },
 
-        resetSelection: function () {
+        hideIcons: function () {
             for(var i = 0; i < this.selectedTiles.length; i++) {
                 var tile = this.tiles.getAt(this.selectedTiles[i].x)
                                      .getAt(this.selectedTiles[i].y);
                 tile.revealed = false;
-                this.add.tween(tile.scale).to({ x: 1, y: 1}, 100, Phaser.Easing.Exponential.In, true);
-                this.add.tween(tile).to({ x: 0, y: 0}, 100, Phaser.Easing.Exponential.In, true);
+                this.add.tween(tile.scale).to({ x: 1, y: 1}, FADE_IN_DELAY,
+                                             Phaser.Easing.Exponential.Out, true);
+                this.add.tween(tile).to({ x: 0, y: 0}, FADE_IN_DELAY,
+                                        Phaser.Easing.Exponential.Out, true);
             }
             this.selectedTiles = []; // Reset variable
-            this.input.onDown.add(this.processClick, this);
+            this.time.events.add(FADE_IN_DELAY, function () {
+            this.input.onDown.add(this.processClick, this);}, this);
         },
 
         hasWon: function () {
