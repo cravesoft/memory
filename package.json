@@ -1,36 +1,33 @@
 {
-    "name": "memory",
-    "description": "Flip over two cards. If they match, then they stay overturned",
-    "readme": "",
-    "repository": "",
-    "version": "0.0.5",
-    "readme": "",
-    "repository": "",
-    "dependencies": {},
-    
-    "devDependencies": {
-        "bower": "*",
-        "gulp": "*",
-        "gulp-util": "*",
-        "gulp-clean": "*",
-        "gulp-concat": "*",
-        "gulp-download": "*",
-        "gulp-rename": "*",
-        "gulp-minify-css": "*",
-        "gulp-minify-html": "*",
-        "gulp-processhtml": "*",
-        "gulp-jshint": "*",
-        "gulp-uglify": "*",
-        "gulp-connect": "*",
-        "gulp-watch": "*",
-        "tiny-lr": "*"
-    },
-
-    "scripts": {
-        "post-install": "node ./node_modules/bower/bin/bower install",
-        "start": "node ./node_modules/gulp/bin/gulp.js",
-
-        "build": "node ./node_modules/gulp/bin/gulp.js build",
-        "lint": "node ./node_modules/gulp/bin/gulp.js lint"
-    }
+  "name": "memory",
+  "description": "Flip over two cards. If they match, then they stay overturned",
+  "readme": "",
+  "repository": "",
+  "version": "0.0.5",
+  "dependencies": {},
+  "devDependencies": {
+    "bower": "*",
+    "gulp": "*",
+    "gulp-clean": "*",
+    "gulp-connect": "*",
+    "gulp-if": "*",
+    "gulp-jshint": "*",
+    "gulp-minify-css": "*",
+    "gulp-minify-html": "*",
+    "gulp-processhtml": "*",
+    "gulp-rimraf": "*",
+    "gulp-streamify": "*",
+    "gulp-uglify": "*",
+    "gulp-util": "*",
+    "gulp-watch": "*",
+    "i18next-client": "*",
+    "tiny-lr": "*",
+    "vinyl-source-stream": "*"
+  },
+  "scripts": {
+    "post-install": "node ./node_modules/bower/bin/bower install",
+    "start": "node ./node_modules/gulp/bin/gulp.js",
+    "build": "node ./node_modules/gulp/bin/gulp.js build",
+    "lint": "node ./node_modules/gulp/bin/gulp.js lint"
+  }
 }

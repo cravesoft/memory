@@ -1,66 +1,60 @@
-(function () {
-    'use strict';
+var Boot = function () {};
 
-    function Boot() {}
+module.exports = Boot;
 
-    Boot.prototype = {
+Boot.prototype = {
 
-        init: function () {
-            // Your game can check orientated in internal loops to know if it
-            // should pause or not
-            this.orientated = false;
+    init: function () {
+        // Your game can check orientated in internal loops to know if it
+        // should pause or not
+        this.orientated = false;
 
-            // Unless you specifically know your game needs to support
-            // multi-touch I would recommend setting this to 1
-            this.input.maxPointers = 1;
+        // Unless you specifically know your game needs to support
+        // multi-touch I would recommend setting this to 1
+        this.input.maxPointers = 1;
 
-            // Phaser will automatically pause if the browser tab the game is
-            // in loses focus. You can disable that here:
-            this.stage.disableVisibilityChange = true;
+        // Phaser will automatically pause if the browser tab the game is
+        // in loses focus. You can disable that here:
+        this.stage.disableVisibilityChange = true;
 
-            // Loading screen will have a black background
-            this.stage.backgroundColor = '#000';
+        // Loading screen will have a black background
+        this.stage.backgroundColor = '#000';
 
-            if(this.game.device.desktop) {
-                this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-                this.scale.setMinMax(480, 260, 1280, 720);
-                this.scale.pageAlignHorizontally = true;
-                this.scale.pageAlignVertically = true;
-                this.scale.setScreenSize(true);
-                this.scale.refresh();
-            } else {
-                this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-                this.scale.setMinMax(480, 260, 1280, 720);
-                this.scale.pageAlignHorizontally = true;
-                this.scale.pageAlignVertically = true;
-                this.scale.forceOrientation(true, false);
-                this.scale.enterIncorrectOrientation.add(this.enterIncorrectOrientation, this);
-                this.scale.leaveIncorrectOrientation.add(this.leaveIncorrectOrientation, this);
-                this.scale.setScreenSize(true);
-                this.scale.refresh();
-            }
-        },
-
-        preload: function () {
-            this.load.image('preloader', 'assets/preloader.gif');
-        },
-
-        create: function () {
-            this.game.state.start('preloader');
-        },
-
-        enterIncorrectOrientation: function () {
-            this.orientated = false;
-            document.getElementById('orientation').style.display = 'block';
-        },
-
-        leaveIncorrectOrientation: function () {
-            this.orientated = true;
-            document.getElementById('orientation').style.display = 'none';
+        if(this.game.device.desktop) {
+            this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+            this.scale.setMinMax(480, 260, 1280, 720);
+            this.scale.pageAlignHorizontally = true;
+            this.scale.pageAlignVertically = true;
+            this.scale.setScreenSize(true);
+            this.scale.refresh();
+        } else {
+            this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+            this.scale.setMinMax(480, 260, 1280, 720);
+            this.scale.pageAlignHorizontally = true;
+            this.scale.pageAlignVertically = true;
+            this.scale.forceOrientation(true, false);
+            this.scale.enterIncorrectOrientation.add(this.enterIncorrectOrientation, this);
+            this.scale.leaveIncorrectOrientation.add(this.leaveIncorrectOrientation, this);
+            this.scale.setScreenSize(true);
+            this.scale.refresh();
         }
-    };
+    },
 
-    window['memory'] = window['memory'] || {};
-    window['memory'].Boot = Boot;
+    preload: function () {
+        this.load.image('preloader', 'assets/preloader.gif');
+    },
 
-}());
+    create: function () {
+        this.game.state.start('Preloader');
+    },
+
+    enterIncorrectOrientation: function () {
+        this.orientated = false;
+        document.getElementById('orientation').style.display = 'block';
+    },
+
+    leaveIncorrectOrientation: function () {
+        this.orientated = true;
+        document.getElementById('orientation').style.display = 'none';
+    }
+};
