@@ -9,17 +9,14 @@ var TILE_SIZE = 20 // Size of tile height & width in pixels
   , TILE_GAP_SIZE = TILE_SIZE + GAP_SIZE
   , TILE_COLOR = 0xffffff // White
   , HIGHLIGHT_COLOR = 0x00ff00 // Green
-  , MIN_BOARD_WIDTH = 2
-  , MAX_BOARD_WIDTH = 10
-  , MIN_BOARD_HEIGHT = 2
-  , MAX_BOARD_HEIGHT = 7
   , TITLE_Y = 170
   , INSTRUCTIONS_Y = 280
   , SMALL_BOARD_SIZE = 4
   , MEDIUM_BOARD_SIZE = 6
   , LARGE_BOARD_WIDTH = 10
   , LARGE_BOARD_HEIGHT = 7
-  , MARKER_SIZE = 4;
+  , MARKER_SIZE = 4
+  , Utils = require('./utils');
 
 Menu.prototype = {
 
@@ -105,19 +102,12 @@ Menu.prototype = {
             this.randomBoard.destroy();
             this.game.boards.pop();
         }
-        var width = Math.floor(Math.random() * (MAX_BOARD_WIDTH + 1 - MIN_BOARD_WIDTH)) + MIN_BOARD_WIDTH;
-        var height;
-        if(width % 2) {
-            height = Math.floor(Math.random() * (Math.floor(MAX_BOARD_HEIGHT * 0.5) + 1 - Math.ceil(MIN_BOARD_WIDTH * 0.5))) + Math.ceil(MIN_BOARD_WIDTH * 0.5);
-            height = height * 2;
-        } else {
-            height = Math.floor(Math.random() * (MAX_BOARD_HEIGHT + 1 - MIN_BOARD_HEIGHT)) + MIN_BOARD_HEIGHT;
-        }
-        var sizex = width * TILE_GAP_SIZE
-          , sizey = height * TILE_GAP_SIZE
+        var board = Utils.getRandomBoard();
+        var sizex = board.width * TILE_GAP_SIZE
+          , sizey = board.height * TILE_GAP_SIZE
           , xmargin = x;
         this.game.boards.push(new Phaser.Rectangle(xmargin + (LARGE_BOARD_WIDTH * TILE_GAP_SIZE - sizex) * 0.5, this.ymargin + (LARGE_BOARD_HEIGHT * TILE_GAP_SIZE - sizey) * 0.5, sizex, sizey));
-        this.randomBoard = this.drawBoard(xmargin + (LARGE_BOARD_WIDTH * TILE_GAP_SIZE - sizex) * 0.5, this.ymargin + (LARGE_BOARD_HEIGHT * TILE_GAP_SIZE - sizey) * 0.5, width, height);
+        this.randomBoard = this.drawBoard(xmargin + (LARGE_BOARD_WIDTH * TILE_GAP_SIZE - sizex) * 0.5, this.ymargin + (LARGE_BOARD_HEIGHT * TILE_GAP_SIZE - sizey) * 0.5, board.width, board.height);
     },
 
     leftTopCoordsOfTile: function(tile) {
