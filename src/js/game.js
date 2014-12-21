@@ -450,13 +450,14 @@
                     // Shake icon
                     var icon = this.icons.getAt(tile.x).getAt(tile.y);
                     this.input.onDown.remove(this.processClick, this);
-                    this.add.tween(icon).to({x: icon.x - 10}, SHAKE_DELAY,
+                    var x = icon.x;
+                    this.add.tween(icon).to({x: icon.x - 5}, SHAKE_DELAY,
                                             Phaser.Easing.Quadratic.InOut, true)
                         .onComplete.add(function () {
-                            this.add.tween(icon).to({x: icon.x + 20}, SHAKE_DELAY,
-                                                    Phaser.Easing.Quadratic.InOut, true, 0, 4, true)
+                            this.add.tween(icon).to({x: icon.x + 10}, SHAKE_DELAY,
+                                                    Phaser.Easing.Quadratic.InOut, true, 0, 1, true)
                                 .onComplete.add(function () {
-                                    this.add.tween(icon).to({x: icon.x - 10}, SHAKE_DELAY,
+                                    this.add.tween(icon).to({x: x}, SHAKE_DELAY,
                                                             Phaser.Easing.Quadratic.InOut, true)
                                         .onComplete.add(function () {
                                             this.input.onDown.add(this.processClick, this);
