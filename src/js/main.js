@@ -1,14 +1,9 @@
-window.onload = function () {
-    'use strict';
+'use strict';
 
-    var game
-      , ns = window['memory'];
+var game = new Phaser.Game(1280, 720, Phaser.AUTO, 'memory-game');
+game.state.add('Boot',  require('./boot'));
+game.state.add('Preloader', require('./preloader'));
+game.state.add('Menu', require('./menu'));
+game.state.add('Game', require('./game'));
 
-    game = new Phaser.Game(1280, 720, Phaser.AUTO, 'memory-game');
-    game.state.add('boot', ns.Boot);
-    game.state.add('preloader', ns.Preloader);
-    game.state.add('menu', ns.Menu);
-    game.state.add('game', ns.Game);
-
-    game.state.start('boot');
-};
+game.state.start('Boot');
