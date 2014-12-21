@@ -1,9 +1,9 @@
 {
     "name": "memory",
-    "description": "",
+    "description": "Flip over two cards. If they match, then they stay overturned",
     "readme": "",
     "repository": "",
-    "version": "0.0.0",
+    "version": "0.0.5",
     "readme": "",
     "repository": "",
     "dependencies": {},
