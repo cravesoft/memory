@@ -12,10 +12,6 @@ var TILE_SIZE = 90 // Size of tile height & width in pixels
   , MARKER_RADIUS = TILE_RADIUS
   , BUTTON_SIZE = 70
   , BUTTON_MARGIN = 10
-  , MIN_BOARD_WIDTH = 2
-  , MAX_BOARD_WIDTH = 10
-  , MIN_BOARD_HEIGHT = 2
-  , MAX_BOARD_HEIGHT = 7
   , TILE_COLOR = 0xffffff // White
   , HIGHLIGHT_COLOR = 0x00ff00 // Green
   , REVEAL_DELAY = 0.6 // 0.6 second
@@ -78,13 +74,14 @@ var TILE_SIZE = 90 // Size of tile height & width in pixels
                   FLASK, FROWN, GLASS, HEART, HOME, KEY, LEAF, CUTLERY,
                   MAGNET, MEH, MUSIC, PAPER_PLANE, PAINT_BRUSH, PAW, PLANE,
                   PLUG, PLUS, ROCKET, TROPHY, SMILE, STAR, TRUCK, UMBRELLA,
-                  WRENCH];
+                  WRENCH]
+  , Utils = require('./utils');
 
 Game.prototype = {
 
     create: function () {
         if(this.game.randomBoard) {
-            this.setRandomSize();
+            this.game.board = Utils.getRandomBoard();
         }
         this.setMargins();
 
@@ -109,8 +106,8 @@ Game.prototype = {
         this.scoreText.anchor.set(0, 0.5);
         if(!!localStorage) {
             this.memoryBestScoreText = 'memory.bestScore' +
-                                       this.game.boardWidth + 'x' +
-                                       this.game.boardHeight;
+                                       this.game.board.width + 'x' +
+                                       this.game.board.height;
             this.bestScore = localStorage.getItem(this.memoryBestScoreText);
             if(this.bestScore !== null) {
                 text = 'Best\n\n' + this.bestScore;
@@ -126,24 +123,11 @@ Game.prototype = {
         this.input.onDown.add(this.processClick, this);
     },
 
-    setRandomSize: function () {
-        var width = Math.floor(Math.random() * (MAX_BOARD_WIDTH + 1 - MIN_BOARD_WIDTH)) + MIN_BOARD_WIDTH;
-        var height;
-        if(width % 2) {
-            height = Math.floor(Math.random() * (Math.floor(MAX_BOARD_HEIGHT * 0.5) + 1 - Math.ceil(MIN_BOARD_WIDTH * 0.5))) + Math.ceil(MIN_BOARD_WIDTH * 0.5);
-            height = height * 2;
-        } else {
-            height = Math.floor(Math.random() * (MAX_BOARD_HEIGHT + 1 - MIN_BOARD_HEIGHT)) + MIN_BOARD_HEIGHT;
-        }
-        this.game.boardWidth = width;
-        this.game.boardHeight = height;
-    },
-
     setMargins: function () {
-        this.xmargin = parseInt((this.world.width - (this.game.boardWidth *
+        this.xmargin = parseInt((this.world.width - (this.game.board.width *
                                 TILE_GAP_SIZE)) * 0.5);
         this.ymargin = parseInt((this.world.height -
-                                 (this.game.boardHeight * TILE_GAP_SIZE)) *
+                                 (this.game.board.height * TILE_GAP_SIZE)) *
                                 0.5);
         this.borderLeft = this.xmargin + HALF_GAP_SIZE;
         this.borderRight = this.world.width - this.xmargin - HALF_GAP_SIZE;
@@ -199,8 +183,8 @@ Game.prototype = {
         this.selectedTiles = [];
         this.numTiles = 0;
         this.input.onDown.remove(this.processClick, this);
-        for(var x = 0; x < this.game.boardWidth; x++) {
-            for(var y = 0; y < this.game.boardHeight; y++) {
+        for(var x = 0; x < this.game.board.width; x++) {
+            for(var y = 0; y < this.game.board.height; y++) {
                 var tile = this.tiles.getAt(x).getAt(y);
                 if(!tile.revealed) {
                     this.numTiles++;
@@ -227,14 +211,14 @@ Game.prototype = {
     resetBoard: function () {
         this.icons.destroy();
         if(this.game.randomBoard) {
-            this.setRandomSize();
+            this.game.board = Utils.getRandomBoard();
             this.setMargins();
             this.tiles.destroy();
             this.createBoard();
             if(!!localStorage) {
                 this.memoryBestScoreText = 'memory.bestScore' +
-                                           this.game.boardWidth + 'x' +
-                                           this.game.boardHeight;
+                                           this.game.board.width + 'x' +
+                                           this.game.board.height;
                 this.bestScore = localStorage.getItem(this.memoryBestScoreText);
                 var text;
                 if(this.bestScore !== null) {
@@ -272,8 +256,8 @@ Game.prototype = {
         this.shuffle(icons);
 
         // Calculate how many icons are needed
-        var numIconsUsed = parseInt(this.game.boardWidth *
-                                    this.game.boardHeight * 0.5);
+        var numIconsUsed = parseInt(this.game.board.width *
+                                    this.game.board.height * 0.5);
 
         // Make two of each
         icons = icons.slice(0, numIconsUsed);
@@ -282,9 +266,9 @@ Game.prototype = {
 
         // Create the board data structure, with randomly placed icons
         var board = [];
-        for(var x = 0; x < this.game.boardWidth; x++) {
+        for(var x = 0; x < this.game.board.width; x++) {
             var column = [];
-            for(var y = 0; y < this.game.boardHeight; y++) {
+            for(var y = 0; y < this.game.board.height; y++) {
                 column.push(icons[0]);
                 icons.splice(0, 1);
             }
@@ -315,9 +299,9 @@ Game.prototype = {
     drawIcons: function(board) {
         // Draw all the icons
         this.icons = this.add.group();
-        for(var x = 0; x < this.game.boardWidth; x++) {
+        for(var x = 0; x < this.game.board.width; x++) {
             var column = this.add.group();
-            for(var y = 0; y < this.game.boardHeight; y++) {
+            for(var y = 0; y < this.game.board.height; y++) {
                 var leftTop = this.leftTopCoordsOfTile({x: x, y: y})
                   , icon = this.getShapeAndColor(board, {x: x, y: y});
                 column.add(this.drawIcon(icon, leftTop.x, leftTop.y));
@@ -329,9 +313,9 @@ Game.prototype = {
     drawTiles: function() {
         // Draw all the tiles
         this.tiles = this.add.group();
-        for(var x = 0; x < this.game.boardWidth; x++) {
+        for(var x = 0; x < this.game.board.width; x++) {
             var column = this.add.group();
-            for(var y = 0; y < this.game.boardHeight; y++) {
+            for(var y = 0; y < this.game.board.height; y++) {
                 var leftTop = this.leftTopCoordsOfTile({x: x, y: y})
                   , tile = this.add.graphics();
                 tile.beginFill(TILE_COLOR);
@@ -494,8 +478,8 @@ Game.prototype = {
 
     hasWon: function () {
         // Returns true if all the tiles have been revealed, otherwise false
-        for(var x = 0; x < this.game.boardWidth; x++) {
-            for(var y = 0; y < this.game.boardHeight; y++) {
+        for(var x = 0; x < this.game.board.width; x++) {
+            for(var y = 0; y < this.game.board.height; y++) {
                 if(!this.tiles.getAt(x).getAt(y).revealed) {
                     return false; // Return false if any tiles are covered
                 }
