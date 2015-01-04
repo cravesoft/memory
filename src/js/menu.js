@@ -18,7 +18,8 @@ var TILE_SIZE = 20 // Size of tile height & width in pixels
   , LARGE_BOARD_WIDTH = 10
   , LARGE_BOARD_HEIGHT = 7
   , MARKER_SIZE = 4
-  , Utils = require('./utils');
+  , Utils = require('./utils')
+  , i18n = require('i18next-client');
 
 Menu.prototype = {
 
@@ -30,12 +31,12 @@ Menu.prototype = {
         this.background = this.add.tileSprite(0, 0, this.world.width,
                                               this.world.height,
                                               'background');
-        var text = 'Memory'
+        var text = i18n.t('menu.title')
           , style = { font: '50px Arial', fill: '#ffffff', align: 'center' }
           , t = this.add.text(this.world.centerX, TITLE_Y, text, style);
         t.anchor.set(0.5);
 
-        text = 'Choose a board to start';
+        text = i18n.t('menu.instructions');
         style = { font: '40px Arial', fill: '#ffffff', align: 'center' };
         t = this.add.text(this.world.centerX, INSTRUCTIONS_Y, text, style);
         t.anchor.set(0.5);
@@ -52,8 +53,8 @@ Menu.prototype = {
                               this.drawAndPositionRandomBoard, this, size * 4 + (SMALL_BOARD_SIZE + MEDIUM_BOARD_SIZE + LARGE_BOARD_WIDTH) * TILE_GAP_SIZE);
         t = this.add.text(size * 4 + (SMALL_BOARD_SIZE + MEDIUM_BOARD_SIZE + LARGE_BOARD_WIDTH * 1.5) * TILE_GAP_SIZE, this.ymargin +
                           (LARGE_BOARD_HEIGHT * TILE_GAP_SIZE) + 30,
-                          'Random', { font: '30px Arial', fill: '#ffffff',
-                                      align: 'center' });
+                          i18n.t('menu.random'),
+                          { font: '30px Arial', fill: '#ffffff', align: 'center' });
         t.anchor.set(0.5, 0);
 
         this.marker = this.add.graphics();
@@ -90,7 +91,7 @@ Menu.prototype = {
         if(!!localStorage) {
             var bestScore = localStorage.getItem('memory.bestScore' + width + 'x' + width);
             if(bestScore) {
-                var text = 'Best\n\n' + bestScore
+                var text = i18n.t('menu.best') + '\n\n' + bestScore
                   , t = this.add.text(x, y, text, { font: '30px Arial',
                                                     fill: '#ffffff',
                                                     align: 'center' });

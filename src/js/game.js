@@ -77,7 +77,8 @@ var TILE_SIZE = 90 // Size of tile height & width in pixels
                   MAGNET, MEH, MUSIC, PAPER_PLANE, PAINT_BRUSH, PAW, PLANE,
                   PLUG, PLUS, ROCKET, TROPHY, SMILE, STAR, TRUCK, UMBRELLA,
                   WRENCH]
-  , Utils = require('./utils');
+  , Utils = require('./utils')
+  , i18n = require('i18next-client');
 
 Game.prototype = {
 
@@ -90,7 +91,7 @@ Game.prototype = {
         this.background = this.add.tileSprite(0, 0, this.world.width,
                                               this.world.height,
                                               'background');
-        this.selectedTiles = []; // Stores the (x, y) of the tiles clicked
+        this.selectedTiles = []; // Stores the (x, y) of the selected tiles
         this.createBoard();
         this.createMenu();
         this.marker = this.add.graphics();
@@ -100,7 +101,7 @@ Game.prototype = {
                                     TILE_SIZE + MARKER_SIZE * 0.5, MARKER_RADIUS);
 
         this.score = 0;
-        var text = 'Tries\n\n' + this.score;
+        var text = i18n.t('game.tries') + '\n\n' + this.score;
         this.textStyle = { font: '30px Arial', fill: '#ffffff',
                            align: 'center' };
         this.scoreText = this.add.text(15, this.world.height - 60, text,
@@ -112,9 +113,9 @@ Game.prototype = {
                                        this.game.board.height;
             this.bestScore = localStorage.getItem(this.memoryBestScoreText);
             if(this.bestScore !== null) {
-                text = 'Best\n\n' + this.bestScore;
+                text = i18n.t('game.best') + '\n\n' + this.bestScore;
             } else {
-                text = 'Best\n\n?';
+                text = i18n.t('game.best') + '\n\n?';
             }
             this.bestText = this.add.text(this.world.width - 15,
                                           this.world.height - 60, text,
@@ -224,9 +225,9 @@ Game.prototype = {
                 this.bestScore = localStorage.getItem(this.memoryBestScoreText);
                 var text;
                 if(this.bestScore !== null) {
-                    text = 'Best\n\n' + this.bestScore;
+                    text = i18n.t('game.best') + '\n\n' + this.bestScore;
                 } else {
-                    text = 'Best\n\n?';
+                    text = i18n.t('game.best') + '\n\n?';
                 }
                 this.bestText.setText(text);
             }
@@ -241,7 +242,7 @@ Game.prototype = {
             this.world.bringToTop(this.tiles);
         }
         this.score = 0;
-        this.scoreText.setText('Tries\n\n' + this.score);
+        this.scoreText.setText(i18n.t('game.tries') + '\n\n' + this.score);
         this.input.onDown.add(this.processClick, this);
     },
 
@@ -397,41 +398,39 @@ Game.prototype = {
                                                  FADE_OUT_DELAY, Phaser.Easing.Linear.Out, true);
                 this.selectedTiles.push(tile);
                 if(this.selectedTiles.length > 1) {
-                    // The current tile was the second tile clicked
-                    // Update score
+                    // The current tile is the second selected tile
                     this.score++;
-                    this.scoreText.setText('Tries\n\n' + this.score);
+                    this.scoreText.setText(i18n.t('game.tries') + '\n\n' + this.score);
                     // Check if there is a match between the two icons
                     var icon1 = this.getShapeAndColor(this.mainBoard, this.selectedTiles[0])
                       , icon2 = this.getShapeAndColor(this.mainBoard, tile);
                     if(icon1.shape !== icon2.shape || icon1.color !== icon2.color) {
-                        // Icons don't match. Wait and hide both icons
+                        // Icons don't match, wait and hide both icons
                         this.input.onDown.remove(this.processClick, this);
                         this.time.events.add(Phaser.Timer.SECOND * REVEAL_DELAY,
                                              this.hideIcons, this);
                     } else {
-                        if(this.hasWon()) { // Check if all pairs found
+                        if(this.hasWon()) { // Check if all pairs are found
                             // Show the fully unrevealed board for a few seconds
                             this.time.events.add(Phaser.Timer.SECOND * GAMEOVER_DELAY,
                                                  this.removeBoard, this);
-                            // Update best score ?
                             if(!!localStorage) {
+                                // Update best score
                                 this.bestScore = localStorage.getItem(this.memoryBestScoreText);
                                 if(this.bestScore === null || this.bestScore > this.score) {
                                     this.bestScore = this.score;
                                     localStorage.setItem(this.memoryBestScoreText,
                                                          this.bestScore);
-                                    var text = 'Best\n\n' + this.bestScore;
+                                    var text = i18n.t('game.best') + '\n\n' + this.bestscore;
                                     this.bestText.setText(text);
                                 }
                             }
                         }
-                        this.selectedTiles = []; // Reset variable
+                        this.selectedTiles = [];
                     }
                 }
             } else {
-                // Tile is already flipped
-                // Shake icon
+                // Tile is already flipped, shake icon
                 var icon = this.icons.getAt(tile.x).getAt(tile.y);
                 this.input.onDown.remove(this.processClick, this);
                 var x = icon.x;
@@ -473,13 +472,13 @@ Game.prototype = {
             this.add.tween(tile).to({ x: 0, y: 0}, FADE_IN_DELAY,
                                     Phaser.Easing.Exponential.Out, true);
         }
-        this.selectedTiles = []; // Reset variable
+        this.selectedTiles = [];
         this.time.events.add(FADE_IN_DELAY, function () {
         this.input.onDown.add(this.processClick, this);}, this);
     },
 
     hasWon: function () {
-        // Returns true if all the tiles have been revealed, otherwise false
+        // Return true if all the tiles have been revealed, otherwise false
         for(var x = 0; x < this.game.board.width; x++) {
             for(var y = 0; y < this.game.board.height; y++) {
                 if(!this.tiles.getAt(x).getAt(y).revealed) {
