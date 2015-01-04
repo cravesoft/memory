@@ -1,3 +1,5 @@
+'use strict';
+
 var Boot = function () {};
 
 module.exports = Boot;

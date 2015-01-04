@@ -1,3 +1,5 @@
+'use strict';
+
 var MIN_BOARD_WIDTH = 2
   , MAX_BOARD_WIDTH = 10
   , MIN_BOARD_HEIGHT = 2
