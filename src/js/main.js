@@ -5,8 +5,11 @@ var i18n = require('i18next-client');
 i18n.init({
     //lng: 'en-US',
     ns: { namespaces: ['ns.common', 'ns.special'], defaultNs: 'ns.special'},
+    load: 'current',
+    getAsync: false,
     useLocalStorage: false,
     useCookie: false,
+    fallbackLng: false,
     debug: true
 });
 
