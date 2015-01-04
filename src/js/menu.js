@@ -162,16 +162,13 @@ Menu.prototype = {
         if(idx !== null) {
             if(idx === 0) {
                 this.game.randomBoard = false;
-                this.game.boardWidth = SMALL_BOARD_SIZE;
-                this.game.boardHeight = SMALL_BOARD_SIZE;
+                this.game.board = {width: SMALL_BOARD_SIZE, height: SMALL_BOARD_SIZE};
             } else if(idx === 1) {
                 this.game.randomBoard = false;
-                this.game.boardWidth = MEDIUM_BOARD_SIZE;
-                this.game.boardHeight = MEDIUM_BOARD_SIZE;
+                this.game.board = {width: MEDIUM_BOARD_SIZE, height: MEDIUM_BOARD_SIZE};
             } else if(idx === 2) {
                 this.game.randomBoard = false;
-                this.game.boardWidth = LARGE_BOARD_WIDTH;
-                this.game.boardHeight = LARGE_BOARD_HEIGHT;
+                this.game.board = {width: LARGE_BOARD_WIDTH, height: LARGE_BOARD_HEIGHT};
             } else if(idx === 3) {
                 this.game.randomBoard = true;
             }
