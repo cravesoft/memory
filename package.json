@@ -8,7 +8,6 @@
   "devDependencies": {
     "bower": "*",
     "gulp": "*",
-    "gulp-clean": "*",
     "gulp-connect": "*",
     "gulp-if": "*",
     "gulp-jshint": "*",
