@@ -1,6 +1,5 @@
 var gulp = require('gulp')
     , gutil = require('gulp-util')
-    , clean = require('gulp-clean')
     , minifycss = require('gulp-minify-css')
     , minifyhtml = require('gulp-minify-html')
     , processhtml = require('gulp-processhtml')
@@ -25,10 +24,15 @@ paths = {
         'src/bower_components/font-awesome/css/font-awesome.css'
     ],
     libs:  [
-        'src/bower_components/phaser-official/build/phaser.js'
+        'src/bower_components/phaser-official/build/phaser.js',
+        'src/bower_components/jquery/dist/jquery.js',
+        'src/bower_components/i18next/i18next.js'
     ],
     fonts: [
         'src/bower_components/font-awesome/fonts/fontawesome-webfont.*'
+    ],
+    locales: [
+        'src/locales/**/*',
     ],
     js:     ['src/js/*.js', 'src/js/**/*.js'],
     entry: './src/js/main.js',
@@ -56,11 +60,6 @@ gulp.task('compile', ['clean'], function () {
 });
 
 gulp.task('clean', function () {
-    return gulp.src(paths.dist, {read: false})
-        .pipe(clean({force: true}))
-        .on('error', gutil.log);
-});
-gulp.task('clean', function () {
   return gulp.src(paths.dist, {read: false})
     .pipe(rimraf({ force: true }))
     .on('error', gutil.log);
@@ -79,6 +78,9 @@ gulp.task('copy', ['clean'], function () {
         .on('error', gutil.log);
     gulp.src(paths.fonts)
         .pipe(gulp.dest(paths.dist + 'fonts'))
+        .on('error', gutil.log);
+    gulp.src(paths.locales)
+        .pipe(gulp.dest(paths.dist + 'locales'))
         .on('error', gutil.log);
 });
 
@@ -129,7 +131,7 @@ gulp.task('connect', function () {
 
 gulp.task('watch', function () {
     watching = true;
-    return gulp.watch(['./src/index.html', paths.css, paths.js, paths.assets], ['build', 'lint', 'html']);
+    return gulp.watch(['./src/index.html', paths.css, paths.js, paths.assets, paths.locales, paths.fonts], ['build', 'lint', 'html']);
 });
 
 gulp.task('default', ['connect', 'watch', 'build']);
