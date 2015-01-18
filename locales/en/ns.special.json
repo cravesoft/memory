@@ -1,0 +1,12 @@
+{
+    "menu": {
+      "title": "Memory",
+      "instructions": "Choose a board to start",
+      "random": "Random",
+      "best": "Best"
+    },
+    "game": {
+      "best": "Best",
+      "tries": "Tries"
+    }
+}

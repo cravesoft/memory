@@ -1,0 +1,12 @@
+{
+    "menu": {
+      "title": "Memory",
+      "instructions": "Choisis un plateau de jeu",
+      "random": "Aléatoire",
+      "best": "Meilleur score"
+    },
+    "game": {
+      "best": "Meilleur",
+      "tries": "Essais"
+    }
+}
