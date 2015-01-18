@@ -1,7 +1,7 @@
 'use strict';
 
 var i18n = require('i18next-client')
-  , game = new Phaser.Game(1280, 720, Phaser.AUTO, 'memory-game');
+  , game = new Phaser.Game(1280, 720, Phaser.AUTO, 'game');
 game.state.add('Boot',  require('./boot'));
 game.state.add('Preloader', require('./preloader'));
 game.state.add('Menu', require('./menu'));

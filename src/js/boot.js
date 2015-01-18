@@ -27,8 +27,6 @@ Boot.prototype = {
             this.scale.setMinMax(480, 260, 1280, 720);
             this.scale.pageAlignHorizontally = true;
             this.scale.pageAlignVertically = true;
-            this.scale.setScreenSize(true);
-            this.scale.refresh();
         } else {
             this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
             this.scale.setMinMax(480, 260, 1280, 720);
@@ -37,8 +35,6 @@ Boot.prototype = {
             this.scale.forceOrientation(true, false);
             this.scale.enterIncorrectOrientation.add(this.enterIncorrectOrientation, this);
             this.scale.leaveIncorrectOrientation.add(this.leaveIncorrectOrientation, this);
-            this.scale.setScreenSize(true);
-            this.scale.refresh();
         }
     },
 

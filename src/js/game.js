@@ -411,9 +411,6 @@ Game.prototype = {
                                              this.hideIcons, this);
                     } else {
                         if(this.hasWon()) { // Check if all pairs are found
-                            // Show the fully unrevealed board for a few seconds
-                            this.time.events.add(Phaser.Timer.SECOND * GAMEOVER_DELAY,
-                                                 this.removeBoard, this);
                             if(!!localStorage) {
                                 // Update best score
                                 this.bestScore = localStorage.getItem(this.memoryBestScoreText);
@@ -421,10 +418,13 @@ Game.prototype = {
                                     this.bestScore = this.score;
                                     localStorage.setItem(this.memoryBestScoreText,
                                                          this.bestScore);
-                                    var text = i18n.t('game.best') + '\n\n' + this.bestscore;
+                                    var text = i18n.t('game.best') + '\n\n' + this.bestScore;
                                     this.bestText.setText(text);
                                 }
                             }
+                            // Show the fully unrevealed board for a few seconds
+                            this.time.events.add(Phaser.Timer.SECOND * GAMEOVER_DELAY,
+                                                 this.removeBoard, this);
                         }
                         this.selectedTiles = [];
                     }
